@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/svn/pygr-align/!svn/ver/31/trunk/clustalw
+END
+Clustalw_NLMSA.py
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/pygr-align/!svn/ver/31/trunk/clustalw/Clustalw_NLMSA.py
+END
+test_clustalw_alignment.aln
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/pygr-align/!svn/ver/31/trunk/clustalw/test_clustalw_alignment.aln
+END
+test_genomes_file
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/pygr-align/!svn/ver/31/trunk/clustalw/test_genomes_file
+END
+Clustalw_NLMSA_test.py
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/pygr-align/!svn/ver/31/trunk/clustalw/Clustalw_NLMSA_test.py
+END

@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/svn/pygr-align/!svn/ver/31/trunk/blastz
+END
+blastz_NLMSA_test.py
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/pygr-align/!svn/ver/31/trunk/blastz/blastz_NLMSA_test.py
+END
+test_genomes.fna
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/pygr-align/!svn/ver/31/trunk/blastz/test_genomes.fna
+END
+blastz_NLMSA.py
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/pygr-align/!svn/ver/32/trunk/blastz/blastz_NLMSA.py
+END
+output
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/pygr-align/!svn/ver/31/trunk/blastz/output
+END
