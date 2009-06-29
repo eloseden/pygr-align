@@ -10,6 +10,7 @@ class Blastz_test(unittest.TestCase):
     """
     def setUp(self):
         self.buf = open('output').read()
+        self.buf = self.buf.replace("\r\n","\n")
         
         
         
@@ -20,7 +21,7 @@ class Blastz_test(unittest.TestCase):
     def test_construct_coord(self):
         lavmarkers_list = blastz_NLMSA.find_lavmarkers(self.buf)
         self.assertEqual(blastz_NLMSA.construct_coord(lavmarkers_list),
-                         [(228, 524)])
+                         [(218, 490)])
         
     def test_get_names(self):
         lav_marker_list = blastz_NLMSA.find_lavmarkers(self.buf)
@@ -29,7 +30,7 @@ class Blastz_test(unittest.TestCase):
            start_index = int(coord[0])
            end_index = int(coord[1])
            lav_block = self.buf[start_index:end_index]
-           records = lav_block.split('\r\n}\r\n')
+           records = lav_block.split('\n}\n')
         self.assertEqual(blastz_NLMSA.get_names(records),
                          ['testgenome1', 'testgenome2'])
         
@@ -76,6 +77,8 @@ class blastz_NLMSA_test(unittest.TestCase):
 
     def setUp(self):
         self.buf = open('output').read()
+        self.buf = self.buf.replace("\r\n","\n")
+        
         thisdir = os.path.abspath(os.path.dirname(__file__))
         self.db = seqdb.SequenceFileDB(os.path.join(thisdir,
                                                     'test_genomes.fna'))
@@ -85,9 +88,9 @@ class blastz_NLMSA_test(unittest.TestCase):
                                       use_virtual_lpo=True)
         alignment += self.db[genome_names[0]]
 
-        buf = open(os.path.join(thisdir, 'output')).read()
 
-        self.temp_nlmsa = blastz_NLMSA.create_NLMSA_blastz(buf,
+
+        self.temp_nlmsa = blastz_NLMSA.create_NLMSA_blastz(self.buf,
                                                    self.db, alignment)
     
         

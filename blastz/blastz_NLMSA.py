@@ -145,7 +145,7 @@ def parse_blastz(buf):
         start_index = int(coord[0])
         end_index = int(coord[1])
         lav_block = buf[start_index:end_index]
-        records = lav_block.split('\r\n}\r\n')
+        records = lav_block.split('\n}\n')
         orient = get_orient(records)
         names = get_names(records)
         genome_names = genome_names.union(set(names))
@@ -163,7 +163,7 @@ def _parse_blastz_record_block(records, orient, genome_name1, genome_name2):
     matches = []
     for record in records:
         # convert by linebreaks
-        lines = record.split('\r\n')
+        lines = record.split('\n')
 
         # get rid of comments
         lines = [ i for i in lines if len(i) and i[0] != '#' ]
