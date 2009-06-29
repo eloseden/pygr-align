@@ -1,34 +1,0 @@
-8
-
-dir
-31
-http://iorich.caltech.edu/svn/pygr-align/trunk
-http://iorich.caltech.edu/svn/pygr-align
-
-
-
-2009-06-25T16:53:55.378159Z
-31
-edenelos
-
-
-svn:special svn:externals svn:needs-lock
-
-
-
-
-
-
-
-
-
-
-
-f5f784de-d73a-4e9a-9cd1-f25588d7c73c
-
-blastz
-dir
-
-clustalw
-dir
-
