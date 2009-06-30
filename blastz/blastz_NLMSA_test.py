@@ -73,7 +73,7 @@ class Blastz_test(unittest.TestCase):
         self.assertEqual(last_ungapped_ident, 84)
 
 
-class blastz_NLMSA_test(unittest.TestCase):
+class Blastz_NLMSA_test(unittest.TestCase):
 
     def setUp(self):
         self.buf = open('output').read()
@@ -123,7 +123,7 @@ class blastz_NLMSA_test(unittest.TestCase):
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(Blastz_test))
-    suite.addTest(unittest.makeSuite(blastz_NLMSA_test))
+    suite.addTest(unittest.makeSuite(Blastz_NLMSA_test))
     return suite
 
 

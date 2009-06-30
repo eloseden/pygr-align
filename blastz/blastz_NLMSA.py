@@ -233,13 +233,7 @@ def create_NLMSA_blastz(buf, seqDb, al):
 
 
     for blz_al in blastzaln_list:
-
-        start1 = getattr(blz_al, "start_top")
-        stop1 = getattr(blz_al, "end_top")
         genome_name1 = getattr(blz_al, "genome_name1")
-
-        start2 = getattr(blz_al, "start_bot")
-        stop2 = getattr(blz_al, "end_bot")       
         genome_name2= getattr(blz_al, "genome_name2")
             
         block = getattr(blz_al, "blocks")

@@ -1,0 +1,22 @@
+[1mdiff --git a/blastz/blastz_NLMSA.py b/blastz/blastz_NLMSA.py[m
+[1mindex 92ac665..f619cc6 100644[m
+[1m--- a/blastz/blastz_NLMSA.py[m
+[1m+++ b/blastz/blastz_NLMSA.py[m
+[36m@@ -145,7 +145,7 @@ def parse_blastz(buf):[m
+         start_index = int(coord[0])[m
+         end_index = int(coord[1])[m
+         lav_block = buf[start_index:end_index][m
+[31m-        records = lav_block.split('\n}\n')[m
+[32m+[m[32m        records = lav_block.split('\r\n}\r\n')[m
+         orient = get_orient(records)[m
+         names = get_names(records)[m
+         genome_names = genome_names.union(set(names))[m
+[36m@@ -163,7 +163,7 @@ def _parse_blastz_record_block(records, orient, genome_name1, genome_name2):[m
+     matches = [][m
+     for record in records:[m
+         # convert by linebreaks[m
+[31m-        lines = record.split('\n')[m
+[32m+[m[32m        lines = record.split('\r\n')[m
+ [m
+         # get rid of comments[m
+         lines = [ i for i in lines if len(i) and i[0] != '#' ][m
