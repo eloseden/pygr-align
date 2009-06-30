@@ -17,7 +17,7 @@ from pygr import cnestedlist, seqdb
 class BlastzLocalAlignment:
     """
     A blastz gapped local alignment, consisting of multiple
-    ungapped blocks.
+    ungapped blocks. Parsed from a single alignment block.
     """
     def __init__(self, score, start_top, end_top, start_bot, end_bot,
                  genome_name1, genome_name2, orient, blocks):
