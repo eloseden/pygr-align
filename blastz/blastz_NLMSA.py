@@ -68,6 +68,7 @@ class BlastzUngappedBlock:
 
 def find_lavmarkers(buf):
     """
+    find the #:lav markers and return a list of their index
     """
     lav_marker_list = []
     next_block = 1
@@ -87,6 +88,8 @@ def find_lavmarkers(buf):
 
 def construct_coord(lav_marker_list):
     """
+    return the coordinates of the blocks in a list
+    as identified by consecutive elements of lav_marker_list
     """
     coords = []
     for i in range(0,len(lav_marker_list) - 1):
@@ -109,6 +112,7 @@ def get_orient(records):
 
 def get_names(records):
     """
+    return the names of the sequences in a list
     """
     names = []
     tempstr = records[1]
@@ -129,7 +133,8 @@ def get_names(records):
 
 def parse_blastz(buf):
     """
-    
+    takes a blastz alignment file buffer and returns the alignments
+    and the sequence names
     """
     assert buf[0:5] == '#:lav'," This does not look like a blastz file"
     lav_marker_list=find_lavmarkers(buf)
@@ -223,8 +228,9 @@ def _parse_record(record, orient, genome_name1, genome_name2):
         
 def create_NLMSA_blastz(buf, seqDb, al):
     """
-        takes blastz file buffer as input and creates and returns NLMSA
+    takes blastz file buffer as input and creates and returns NLMSA
     """
+    
     blastzaln_list, genome_names = parse_blastz(buf)
     
     #feed the genomes
@@ -251,6 +257,7 @@ def create_NLMSA_blastz(buf, seqDb, al):
             
             al[ival1] += ival2
 
+    # build alignment
     al.build()
     return al
             

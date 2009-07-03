@@ -7,6 +7,7 @@ import blat_NLMSA
 
 class Blat_test(unittest.TestCase):
     """
+    blat test class to test the various functions
     """
     def setUp(self):
         self.buf = open('output.psl').read()
@@ -85,8 +86,10 @@ class Blat_NLMSA_test(unittest.TestCase):
         
 
     def test_align_manual1(self):
-        # in this test, manual alignments from the blat alignment file are
-        # read and tested against the alignments read and built into the NLMSA
+        """
+        in this test, manual alignments from the blat alignment file are
+        read and tested against the alignments read and built into the NLMSA
+        """
         
         s1 = self.db['testgenome1']
         s2 = self.db['testgenome2']

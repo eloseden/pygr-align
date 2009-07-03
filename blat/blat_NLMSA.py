@@ -64,7 +64,10 @@ class BlatUngappedBlock:
 
 
 def calculate_end(Starts, blockSize):
-    """ Calculate the end coordinates of ungapped blocks"""
+    """
+    Calculate the end coordinates of ungapped blocks
+    """
+    
     Ends = []
           
     for i in range(0, len(blockSize)):
@@ -79,6 +82,7 @@ def parse_blat(buf):
     Takes a blat alignment buffer and returns a list of BlastLocalAlignments
     and names of the genomes.
     """
+
     assert buf[0:8] == 'psLayout', " This is not a blat alignment file"
     
     records = buf.strip().split('\n')
@@ -135,7 +139,7 @@ def parse_blat(buf):
 
 def create_NLMSA_blat(buf, seqDb, al):
     """
-        takes blat file buffer as input and creates and returns NLMSA
+    takes blat file buffer as input and creates and returns NLMSA
     """
     blataln_list, genome_names = parse_blat(buf)
     
@@ -163,6 +167,7 @@ def create_NLMSA_blat(buf, seqDb, al):
             
             al[ival1] += ival2
 
+    # build alignment
     al.build()
     return al
             

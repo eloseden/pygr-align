@@ -7,14 +7,13 @@ import blastz_NLMSA
 
 class Blastz_test(unittest.TestCase):
     """
+    blastz test class to test the various functions 
     """
+    
     def setUp(self):
         self.buf = open('output').read()
         self.buf = self.buf.replace("\r\n","\n")
         
-        
-        
-    
     def test_find_lav_marker(self):
         self.assertEqual(len(blastz_NLMSA.find_lavmarkers(self.buf)), 2)
         
@@ -76,9 +75,10 @@ class Blastz_test(unittest.TestCase):
 class Blastz_NLMSA_test(unittest.TestCase):
 
     def setUp(self):
+
         self.buf = open('output').read()
         self.buf = self.buf.replace("\r\n","\n")
-        
+
         thisdir = os.path.abspath(os.path.dirname(__file__))
         self.db = seqdb.SequenceFileDB(os.path.join(thisdir,
                                                     'test_genomes.fna'))
@@ -88,8 +88,6 @@ class Blastz_NLMSA_test(unittest.TestCase):
                                       use_virtual_lpo=True)
         alignment += self.db[genome_names[0]]
 
-
-
         self.temp_nlmsa = blastz_NLMSA.create_NLMSA_blastz(self.buf,
                                                    self.db, alignment)
     
@@ -97,9 +95,10 @@ class Blastz_NLMSA_test(unittest.TestCase):
         
 
     def test_align_manual1(self):
-        # in this test, manual alignments from the blastz alignment file are
-        # read and tested against the alignments read and built into the NLMSA
-        # perhaps, a better systematic testing can be designed
+        """
+        In this test, manual alignments from the blastz alignment file are
+        read and tested against the alignments read and built into the NLMSA
+        """
         
         s1=self.db['testgenome1']
         temp_lst=[]

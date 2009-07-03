@@ -10,7 +10,7 @@ from pygr import cnestedlist, seqdb
 
 def read_mlagan(buf):
     """
-    Read aligned sequences from a lagan alignment file buffer
+    Read aligned sequences from a mlagan alignment file buffer
     """
     
     assert buf[0].startswith('>'), "This doesn't look like fasta file"
@@ -30,8 +30,10 @@ def read_mlagan(buf):
     return seq_List, seqName
 
 def find_markers(buf):
-    # find the > markers and return a list of their locations and
-    # also return the seq info on those lines in a list
+    """
+    find the > markers and return a list of their locations and
+    the seq info on those lines in a list
+    """
     
     seqMarker_list = []
     seqInfo_list = []
@@ -86,8 +88,8 @@ def build_interval_list(a, b):
 
 def create_NLMSA_mlagan(buf, seqDb, al):
     """
-        takes buffer of a mlagan alignment file as input and creates and
-        returns NLMSA
+    takes mlagan alignment file buffer as input and creates and
+    returns NLMSA
     """
     seqList, seqNames = read_mlagan(buf)
 
@@ -109,6 +111,7 @@ def create_NLMSA_mlagan(buf, seqDb, al):
                 ival2 = genome2_ival[x:y]
                 al[ival1] += ival2
 
+    # build alignment
     al.build()
     return al
     

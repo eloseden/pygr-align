@@ -71,8 +71,8 @@ def build_interval_list(a, b):
 
 def create_NLMSA_lagan(buf, seqDb, al):
     """
-        takes buffer of a lagan alignment file as input and creates and
-        returns NLMSA
+    takes a lagan alignment file buffer as input and creates and
+    returns NLMSA
     """
     seqList, seqNames = read_lagan(buf)
 
@@ -87,6 +87,7 @@ def create_NLMSA_lagan(buf, seqDb, al):
              ival2 = seqDb[seqNames[1]][x:y]
              al[ival1] += ival2
 
+    # build alignment
     al.build()
     return al
 

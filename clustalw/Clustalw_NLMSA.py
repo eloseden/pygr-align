@@ -1,7 +1,5 @@
 # Author Eden Elos
 # May28,08
-
-# convert clustalw2 output format to multiple alignment format(maf)
 # create NLMSA from Clustalw alignment file
 
 # ! /usr/bin/env python2.5
@@ -18,6 +16,7 @@ class ClustalwResidues(object):
     """
     
     def __init__(self, no_seq, seq_names, seqs, start_indices):
+
         self.no_seq = no_seq
         self.seq_names = seq_names
         self.seqs = seqs
@@ -28,35 +27,40 @@ class ClustalwResidues(object):
 
     def get_no_seqs(self):
         """
-         returns the number of sequences in the alignment block
+        returns the number of sequences in the alignment block
         """
+
         return self.no_seq
 
     def get_names(self):
         """
-          returns list of sequence names
+        returns list of sequence names
         """
+
         return self.seq_names
 
     def get_seqs(self):
         """
-         returns list of sequence
+        returns list of sequence
         """
+
         return self.seqs
 
     def get_start_indices(self):
         """
-          returns list of  start indices for each
-          sequence in the alignment block 
+        returns list of  start indices for each
+        sequence in the alignment block 
         """
+
         return self.start_indices
 
     def reset_start_indices(self):
         """
-          reset the start indices if the sequence in the
-          alignment block is all gaps this is done by
-          subtracting 1 from corresponding start_indices...
+        reset the start indices if the sequence in the
+        alignment block is all gaps this is done by
+        subtracting 1 from corresponding start_indices...
         """
+
         ungap_ct = self.ungapped_count()
         for i in range(0, self.no_seq):
             if ungap_ct[i] == 0:
@@ -64,8 +68,9 @@ class ClustalwResidues(object):
 
     def get_end_indices(self):
         """
-         returns list of end indices of each sequence in the alignment block.
+        returns list of end indices of each sequence in the alignment block.
         """
+
         ungapped_lens = self.ungapped_count()
         end_indices = []
         for i in range(0,self.no_seq):
@@ -80,6 +85,7 @@ class ClustalwResidues(object):
         """
         returns the number of gaps in each sequence
         """
+
         gaps = []
         for s in self.seqs:
             gaps.append(s.count("-"))
@@ -108,8 +114,8 @@ def read_clustalw(lines):
     assert lines[0].startswith('CLUSTAL '), lines[0]
     lines = lines[3:]
     seq_counter = 0
+
     # identify the number of sequences
-    
     while True:
         if lines[seq_counter][:16].strip():
             seq_counter += 1
@@ -154,6 +160,7 @@ def read_clustalw(lines):
     return clustal_res_list
 
 def calc_total_length(clustal_res_list):
+    
     total_lengths = clustal_res_list[0].ungapped_count()
     
     for cl_res in clustal_res_list[1:]:
@@ -202,11 +209,14 @@ def build_interval_list(a, b):
 
 def create_NLMSA_clustalw(lines, seqDb, al):
     """
-        takes lines of a clustalw alignment file  as input and creates and returns NLMSA
+    takes lines of a clustalw alignment file  as input and creates and
+    returns NLMSA
     """
+
     clustal_res_list = read_clustalw(lines)
     genome_names = clustal_res_list[0].get_names() 
 
+    # feed the alignment
     al += seqDb[genome_names[0]]
 
     for clu_res in clustal_res_list:    
@@ -238,7 +248,7 @@ def create_NLMSA_clustalw(lines, seqDb, al):
                             ival1 = genome1_ival[a:b]
                             ival2 = genome2_ival[x:y]
                             al[ival1] += ival2
-
+    # build alignment
     al.build()
     return al
 

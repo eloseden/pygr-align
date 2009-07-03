@@ -10,9 +10,11 @@ class Lagan_NLMSA_test(unittest.TestCase):
 
     
     def setUp(self):
-        # initilize/create the NLMSA using lagan alignment file
-        # the file containing the genomes created with in memory mode,
-        # read in the sequences from the genomes file
+        """
+        initilize/create the NLMSA using lagan alignment file
+        the file containing the genomes created with in memory mode,
+        read in the sequences from the genomes file
+        """
 
         self.buf = open('output').read()
         self.buf = self.buf.replace("\r\n","\n")
@@ -37,10 +39,11 @@ class Lagan_NLMSA_test(unittest.TestCase):
 
         
     def test_align_manual1(self):
-        # in this test, alignments from the lagan alignment
-        # file are read and tested against the
-        # alignemnts built into the NLMSA
-        # perhaps, a better systematic testing can be designed
+        """
+        in this test, alignments from the lagan alignment
+        file are read and tested against the
+        alignemnts built into the NLMSA
+        """
         
         s1 = self.db['testgenome1']
         temp_lst = []
