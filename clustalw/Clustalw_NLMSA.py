@@ -251,7 +251,7 @@ def build_clustalw_ivals(lines, seqDb):
                             ival2 = seq2_ival[x:y]
                             ivals.append((ival1,ival2))
                             
-                        yield ivals
+            yield ivals
                             
    
 def create_NLMSA_clustalw(lines, seqDb,al):
@@ -262,3 +262,4 @@ def create_NLMSA_clustalw(lines, seqDb,al):
     for ivals in build_clustalw_ivals(lines, seqDb):
        al.add_aligned_intervals(ivals)
     al.build()
+    return al

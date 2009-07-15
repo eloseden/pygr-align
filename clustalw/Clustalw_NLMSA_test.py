@@ -103,14 +103,6 @@ class Clustalw_NLMSA_test(unittest.TestCase):
         alignment = cnestedlist.NLMSA('test', mode='memory', seqDict=self.db,
                                       use_virtual_lpo=True)
     
-        #alignment += self.db[genome_names[0]]
-
-        #debugging
-        print self.db[genome_names[0]].orientation
-        #end debugging
-        
-
-        
         self.temp_nlmsa = Clustalw_NLMSA.create_NLMSA_clustalw(lines, self.db,
                                                                alignment)
 
@@ -125,10 +117,7 @@ class Clustalw_NLMSA_test(unittest.TestCase):
         
         s1 = self.db['query']
         temp_lst = []
-        
         for s2 in self.temp_nlmsa[s1[:10]]:
-            # print "enters here ....?"
-            # print(str(s2))
             temp_lst.append(str(s2))
         self.assertEqual(temp_lst,['GSFRVLKSRT','RRRHMPLRLA'])
 
