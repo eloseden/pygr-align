@@ -103,7 +103,11 @@ class Clustalw_NLMSA_test(unittest.TestCase):
         alignment = cnestedlist.NLMSA('test', mode='memory', seqDict=self.db,
                                       use_virtual_lpo=True)
     
-        alignment += self.db[genome_names[0]]
+        #alignment += self.db[genome_names[0]]
+
+        #debugging
+        print self.db[genome_names[0]].orientation
+        #end debugging
         
 
         

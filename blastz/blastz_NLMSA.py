@@ -1,12 +1,51 @@
-# Author Eden Elos
+# Author: Eden T. Elos <eloseden@msu.edu>
 # June 17,08
-
-# create NLMSA from Blastz alignment file
-
 # ! /usr/bin/env python2.5
 
-import os
-import glob
+"""
+BLASTZ_NLMSA MODULE
+===================
+A module that parses blastz output from blastz alignment program, and
+builds pygr NLMSAs with it. The module defines the following classes:
+
+- `BlastzLocalAlignment`, a blastz gapped local alignment, consisting of
+  multiple ungapped blocks
+- `BlastzUngappedBlock`, a single ungapped block in a blastz alignment.
+
+Functions:
+
+- `find_lavmarkers()`: find the #:lav markers and return a list of
+  their indices
+- `construct_coord()`: return the coordinates of alignment blocks
+  marked by #:lav markers              
+- `parse_blastz()`: takes a blastz alignment file object and returns the
+  alignments and the sequence names
+- `_parse_blastz_record_block()`: parse out the score and overall begin/end \
+  coords from the alignment blocks, as well as the individual ungapped blocks
+- `_parse_record()`: parse individual lines in an "a {" record block, and
+  return a BlastzLocalAlignment
+- `create_NLMSA_blastz()`: build an NLMSA out of the blastz alignment and
+  returns the alignment object.
+    
+
+How To Use This Module
+======================
+(See the individual classes, methods, and attributes for details.)
+
+1. Import it: ``import blastz_NLMSA``.
+   You will also need to ``from pygr import cnestedlist, seqdb``.
+
+2. Obtain the NLMSA using create_NLMSA_blastz(buf, seqDb, al)
+   function. One needs to pass blastz output file object (buf), sequence
+   database(seqDb) and the NLMSA object (al) to the function and the
+   function returns the modified/built NLMSA.
+   ``nlmsa_aln = create_NLMSA_blastz(buf, seqDb, al)``
+
+"""
+
+__docformat__ = 'restructuredtext'
+
+
 from pygr import cnestedlist, seqdb
 
 
@@ -14,21 +53,24 @@ from pygr import cnestedlist, seqdb
 # BlastzLocalAlignment
 #
 
+
+
+
 class BlastzLocalAlignment:
     """
     A blastz gapped local alignment, consisting of multiple
     ungapped blocks. Parsed from a single alignment block.
     """
     def __init__(self, score, start_top, end_top, start_bot, end_bot,
-                 genome_name1, genome_name2, orient, blocks):
+                 sequence_name1, sequence_name2, orient, blocks):
         self.score = score
         self.start_top = start_top
         self.end_top = end_top
         self.start_bot = start_bot
         self.end_bot = end_bot
 
-        self.genome_name1 = genome_name1
-        self.genome_name2 = genome_name2
+        self.sequence_name1 = sequence_name1
+        self.sequence_name2 = sequence_name2
         
         assert abs(orient) == 1
         self.orient = orient
@@ -68,7 +110,7 @@ class BlastzUngappedBlock:
 
 def find_lavmarkers(buf):
     """
-    find the #:lav markers and return a list of their index
+    Find the #:lav markers and return a list of their index.
     """
     lav_marker_list = []
     next_block = 1
@@ -88,8 +130,8 @@ def find_lavmarkers(buf):
 
 def construct_coord(lav_marker_list):
     """
-    return the coordinates of the blocks in a list
-    as identified by consecutive elements of lav_marker_list
+    Return the coordinates of the blocks in a list
+    as identified by consecutive elements of lav_marker_list.
     """
     coords = []
     for i in range(0,len(lav_marker_list) - 1):
@@ -103,16 +145,15 @@ def construct_coord(lav_marker_list):
 
 def get_orient(records):
     """
-    This is the orientation to be obtained from each lav block
-    The question is how do you make use of the orientation information in
-    NLMSA (if at all) ?
+    This is the orientation to be obtained from each lav block.
+    The orientation information is yet to be used properly.
     """
     orient = 1
     return orient
 
 def get_names(records):
     """
-    return the names of the sequences in a list
+    Return the names of the sequences in a list.
     """
     names = []
     tempstr = records[1]
@@ -133,8 +174,8 @@ def get_names(records):
 
 def parse_blastz(buf):
     """
-    takes a blastz alignment file buffer and returns the alignments
-    and the sequence names
+    Takes a blastz alignment file buffer and returns the alignments
+    and the sequence names.
     """
     assert buf[0:5] == '#:lav'," This does not look like a blastz file"
     lav_marker_list=find_lavmarkers(buf)
@@ -144,7 +185,7 @@ def parse_blastz(buf):
     else:
         return [], []
 
-    genome_names = set()
+    seqs_names = set()
     matches = []
     for coord in lav_coords:
         start_index = int(coord[0])
@@ -153,13 +194,13 @@ def parse_blastz(buf):
         records = lav_block.split('\n}\n')
         orient = get_orient(records)
         names = get_names(records)
-        genome_names = genome_names.union(set(names))
+        seqs_names = seqs_names.union(set(names))
         matches.extend(_parse_blastz_record_block(records, orient, names[0],
                                                   names[1]))
 
-    return matches, list(genome_names)
+    return matches, list(seqs_names)
 
-def _parse_blastz_record_block(records, orient, genome_name1, genome_name2):
+def _parse_blastz_record_block(records, orient, sequence_name1, sequence_name2):
     """
     Run through each alignment block, parsing out the score and
     overall begin/end coords, as well as the individual ungapped
@@ -184,15 +225,15 @@ def _parse_blastz_record_block(records, orient, genome_name1, genome_name2):
 
         if record_type == 'a':
             lines = lines[1:]
-            matches.append(_parse_record(lines, orient, genome_name1,
-                                         genome_name2))
+            matches.append(_parse_record(lines, orient, sequence_name1,
+                                         sequence_name2))
         else:
             continue
 
     return matches
 
 
-def _parse_record(record, orient, genome_name1, genome_name2):
+def _parse_record(record, orient, sequence_name1, sequence_name2):
     """
     Parse individual lines in an "a {" record block, and return a
     BlastzLocalAlignment.
@@ -222,25 +263,25 @@ def _parse_record(record, orient, genome_name1, genome_name2):
     
     return BlastzLocalAlignment(score,
                                 start_top - 1, end_top,
-                                start_bot - 1, end_bot,genome_name1,genome_name2,
+                                start_bot - 1, end_bot,sequence_name1,sequence_name2,
                                 orient, blocks)
 
         
 def create_NLMSA_blastz(buf, seqDb, al):
     """
-    takes blastz file buffer as input and creates and returns NLMSA
+    Takes blastz output file object/buffer as input and creates and returns NLMSA.
     """
     
-    blastzaln_list, genome_names = parse_blastz(buf)
+    blastzaln_list, seqs_names = parse_blastz(buf)
     
-    #feed the genomes
-    for i in range(0,len(genome_names)):
-        al += seqDb[genome_names[i]]
+    #feed the sequences
+    for i in range(0,len(seqs_names)):
+        al += seqDb[seqs_names[i]]
 
 
     for blz_al in blastzaln_list:
-        genome_name1 = getattr(blz_al, "genome_name1")
-        genome_name2= getattr(blz_al, "genome_name2")
+        sequence_name1 = getattr(blz_al, "sequence_name1")
+        sequence_name2= getattr(blz_al, "sequence_name2")
             
         block = getattr(blz_al, "blocks")
         for ungapped in block:
@@ -251,8 +292,8 @@ def create_NLMSA_blastz(buf, seqDb, al):
             x = getattr(ungapped, "start_bot")
             y = getattr(ungapped, "end_bot")
 
-            ival1 = seqDb[genome_name1][a:b]
-            ival2 = seqDb[genome_name2][x:y]
+            ival1 = seqDb[sequence_name1][a:b]
+            ival2 = seqDb[sequence_name2][x:y]
 
             
             al[ival1] += ival2

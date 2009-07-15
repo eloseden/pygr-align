@@ -80,7 +80,7 @@ def calculate_end(Starts, blockSize):
 def parse_blat(buf):
     """
     Takes a blat alignment buffer and returns a list of BlastLocalAlignments
-    and names of the genomes.
+    and names of the sequences.
     """
 
     assert buf[0:8] == 'psLayout', " This is not a blat alignment file"
@@ -88,7 +88,7 @@ def parse_blat(buf):
     records = buf.strip().split('\n')
     records = records[5:]
     
-    genome_names = set()
+    seqs_names = set()
     matches = []
 
     # Each line/record in a blat alignment file contains a single
@@ -117,7 +117,7 @@ def parse_blat(buf):
        tStarts = map(int, record[20].strip(',').split(','))
        qEnds = map(int, calculate_end(qStarts, blockSize))
        tEnds = map(int, calculate_end(tStarts, blockSize))
-       genome_names = genome_names.union(set([qName, tName]))
+       seqs_names = seqs_names.union(set([qName, tName]))
 
        # construct a list of tuples with each tuple containing
        # the i^th ungapped blocks's coords
@@ -135,22 +135,22 @@ def parse_blat(buf):
        
        matches.append(blatLocalAln)       
 
-    return matches, list(genome_names)
+    return matches, list(seqs_names)
 
 def create_NLMSA_blat(buf, seqDb, al):
     """
     takes blat file buffer as input and creates and returns NLMSA
     """
-    blataln_list, genome_names = parse_blat(buf)
+    blataln_list, seqs_names = parse_blat(buf)
     
-    #feed the genomes
-    for i in range(0,len(genome_names)):
-        al += seqDb[genome_names[i]]
+    #feed the sequences
+    for i in range(0,len(seqs_names)):
+        al += seqDb[seqs_names[i]]
 
 
     for blt_al in blataln_list:
-        genome_name1 = getattr(blt_al, "qSeqName")
-        genome_name2= getattr(blt_al, "tSeqName")
+        seqs_name1 = getattr(blt_al, "qSeqName")
+        seqs_name2= getattr(blt_al, "tSeqName")
             
         block = getattr(blt_al, "blocks")
         for ungapped in block:
@@ -161,8 +161,8 @@ def create_NLMSA_blat(buf, seqDb, al):
             x = getattr(ungapped, "tStart")
             y = getattr(ungapped, "tEnd")
 
-            ival1 = seqDb[genome_name1][a:b]
-            ival2 = seqDb[genome_name2][x:y]
+            ival1 = seqDb[seqs_name1][a:b]
+            ival2 = seqDb[seqs_name2][x:y]
 
             
             al[ival1] += ival2

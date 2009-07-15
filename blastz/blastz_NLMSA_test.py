@@ -43,8 +43,8 @@ class Blastz_test(unittest.TestCase):
         start_bot = getattr(blastz_aln, "start_bot")
         end_top = getattr(blastz_aln, "end_top")
         end_bot = getattr(blastz_aln, "end_bot")
-        genome_name1 = getattr(blastz_aln, "genome_name1")
-        genome_name2 = getattr(blastz_aln, "genome_name2")
+        sequence_name1 = getattr(blastz_aln, "sequence_name1")
+        sequence_name2 = getattr(blastz_aln, "sequence_name2")
         orient = getattr(blastz_aln, "orient")
         blocks = getattr(blastz_aln, "blocks")
         
@@ -60,8 +60,8 @@ class Blastz_test(unittest.TestCase):
         self.assertEqual(start_bot, 41)
         self.assertEqual(end_top, 1120)
         self.assertEqual(end_bot, 1120)
-        self.assertEqual(genome_name1, 'testgenome1')
-        self.assertEqual(genome_name2, 'testgenome2')
+        self.assertEqual(sequence_name1, 'testgenome1')
+        self.assertEqual(sequence_name2, 'testgenome2')
         self.assertEqual(orient, 1)
         self.assertEqual(len(blocks), 4)
         

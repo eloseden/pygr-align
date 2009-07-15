@@ -207,17 +207,17 @@ def build_interval_list(a, b):
     return interval_list
 
 
-def create_NLMSA_clustalw(lines, seqDb, al):
+def build_clustalw_ivals(lines, seqDb):
     """
-    takes lines of a clustalw alignment file  as input and creates and
-    returns NLMSA
+    takes lines of a clustalw alignment file  as input and builds the
+    ivals
     """
 
     clustal_res_list = read_clustalw(lines)
-    genome_names = clustal_res_list[0].get_names() 
+    sequence_names = clustal_res_list[0].get_names() 
 
     # feed the alignment
-    al += seqDb[genome_names[0]]
+    #al += seqDb[sequence_names[0]]
 
     for clu_res in clustal_res_list:    
         # build list of aligned sub-intervals
@@ -228,28 +228,95 @@ def create_NLMSA_clustalw(lines, seqDb, al):
 
                 
         for i in range(0, len(seq)):
+            
+            ivals=[]
+            
             start1 = start_indices[i]
             stop1 = end_indices[i]
             if start1 != stop1:
-                genome1_ival = seqDb[genome_names[i]][start1:stop1+1]
-                genome1_ival_str = seq[i]
+                seq1_ival = seqDb[sequence_names[i]][start1:stop1+1]
+                seq1_ival_str = seq[i]
         
                 for j in range(i+1, len(seq)):
                     start2 = start_indices[j]
                     stop2 = end_indices[j]
                     if start2 != stop2:
-                        genome2_ival = seqDb[genome_names[j]][start2:stop2+1]
-                        genome2_ival_str = seq[j]
+                        seq2_ival = seqDb[sequence_names[j]][start2:stop2+1]
+                        seq2_ival_str = seq[j]
                 
-                        interval_list = build_interval_list(genome1_ival_str,
-                                                            genome2_ival_str)
+                        interval_list = build_interval_list(seq1_ival_str,
+                                                            seq2_ival_str)
 
                         for (a, b, x, y) in interval_list:
-                            ival1 = genome1_ival[a:b]
-                            ival2 = genome2_ival[x:y]
-                            al[ival1] += ival2
+                            ival1 = seq1_ival[a:b]
+                            ival2 = seq2_ival[x:y]
+                            ivals.append((ival1,ival2))
+                            #debugging
+                            print "check orientation "
+                            print ival1.orientation,"  ",ival2.orientation
+                            raw_input("press ...")
+                            #end debugging
+        
+                            #al[ival1] += ival2
+                            #al.add_aligned_intervals([(ival1,ival2)])
+                        yield ivals
+                            
     # build alignment
-    al.build()
-    return al
+    #al.build()
+    #return al
 
-    
+def create_NLMSA_clustalw(lines, seqDb,al):
+    """
+    takes lines of a clustalw alignment file  as input and creates and
+    returns NLMSA
+    """
+    for ivals in build_clustalw_ivals(lines, seqDb):
+        #debugging
+        print "enters here"
+        print ivals[0][0].orientation,"  ",ivals[0][1].orientation
+        #end debugging
+        
+        al.add_aligned_intervals(ivals)
+    al.build()
+##        
+##    clustal_res_list = read_clustalw(lines)
+##    sequence_names = clustal_res_list[0].get_names() 
+##
+##    # feed the alignment
+##    #al += seqDb[sequence_names[0]]
+##
+##    for clu_res in clustal_res_list:    
+##        # build list of aligned sub-intervals
+##
+##        seq = clu_res.get_seqs()
+##        start_indices = clu_res.get_start_indices()
+##        end_indices = clu_res.get_end_indices()
+##
+##                
+##        for i in range(0, len(seq)):
+##            start1 = start_indices[i]
+##            stop1 = end_indices[i]
+##            if start1 != stop1:
+##                seq1_ival = seqDb[sequence_names[i]][start1:stop1+1]
+##                seq1_ival_str = seq[i]
+##        
+##                for j in range(i+1, len(seq)):
+##                    start2 = start_indices[j]
+##                    stop2 = end_indices[j]
+##                    if start2 != stop2:
+##                        seq2_ival = seqDb[sequence_names[j]][start2:stop2+1]
+##                        seq2_ival_str = seq[j]
+##                
+##                        interval_list = build_interval_list(seq1_ival_str,
+##                                                            seq2_ival_str)
+##
+##                        for (a, b, x, y) in interval_list:
+##                            ival1 = seq1_ival[a:b]
+##                            ival2 = seq2_ival[x:y]
+##                            #al[ival1] += ival2
+##                            al.add_aligned_intervals([(ival1,ival2)])
+##                            
+##    # build alignment
+##    al.build()
+##    return al
+##    

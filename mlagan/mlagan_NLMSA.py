@@ -1,9 +1,11 @@
-# Author Eden Elos
-# July,01
-# create NLMSA from mlagan alignment file
+"""
+ Parse fasta output from mlagan, and build pygr NLMSAs with it
 
-# ! /usr/bin/env python2.5
-
+ Author Eden Elos
+ July,01
+ 
+ ! /usr/bin/env python2.5
+"""
 import os
 import glob
 from pygr import cnestedlist, seqdb
@@ -99,17 +101,18 @@ def create_NLMSA_mlagan(buf, seqDb, al):
     # a multiple alignment considered as a collection of
     # pairwise alignments so double iteration
     for i in range(0, len(seqList)):
-        genome1_ival = seqDb[seqNames[i]]
-        genome1_ival_str = seqList[i]
+        seqs1_ival = seqDb[seqNames[i]]
+        seqs1_ival_str = seqList[i]
         for j in range(i+1, len(seqList)):
-            genome2_ival = seqDb[seqNames[j]]
-            genome2_ival_str = seqList[j]
-            interval_list = build_interval_list(genome1_ival_str,
-                                                    genome2_ival_str)
+            seqs2_ival = seqDb[seqNames[j]]
+            seqs2_ival_str = seqList[j]
+            interval_list = build_interval_list(seqs1_ival_str,
+                                                    seqs2_ival_str)
             for (a, b, x, y) in interval_list:
-                ival1 = genome1_ival[a:b]
-                ival2 = genome2_ival[x:y]
+                ival1 = seqs1_ival[a:b]
+                ival2 = seqs2_ival[x:y]
                 al[ival1] += ival2
+                #al.add_aligned_intervals([(ival1,ival2)])
 
     # build alignment
     al.build()
