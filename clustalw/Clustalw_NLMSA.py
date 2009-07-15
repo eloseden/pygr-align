@@ -252,9 +252,9 @@ def build_clustalw_ivals(lines, seqDb):
                             ival2 = seq2_ival[x:y]
                             ivals.append((ival1,ival2))
                             #debugging
-                            print "check orientation "
-                            print ival1.orientation,"  ",ival2.orientation
-                            raw_input("press ...")
+                            #print "check orientation "
+                            #print ival1.orientation,"  ",ival2.orientation
+                            #raw_input("press ...")
                             #end debugging
         
                             #al[ival1] += ival2
@@ -272,8 +272,8 @@ def create_NLMSA_clustalw(lines, seqDb,al):
     """
     for ivals in build_clustalw_ivals(lines, seqDb):
         #debugging
-        print "enters here"
-        print ivals[0][0].orientation,"  ",ivals[0][1].orientation
+        #print "enters here"
+        #print ivals[0][0].orientation,"  ",ivals[0][1].orientation
         #end debugging
         
         al.add_aligned_intervals(ivals)
