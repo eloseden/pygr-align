@@ -1,5 +1,5 @@
 
-# Author: Eden T. Elos <eloseden@msu.edu>
+# Author: Eden T. Elos, <eloseden@msu.edu>
 # June 29,08
 # ! /usr/bin/env python2.5
 
@@ -42,16 +42,9 @@ How To Use This Module
 
 __docformat__ = 'restructuredtext'
 
-
-
-
-
 from pygr import cnestedlist, seqdb
 
-
-#
 # BlatLocalAlignment
-#
 
 class BlatLocalAlignment:
     """
@@ -73,10 +66,7 @@ class BlatLocalAlignment:
 
         self.blocks = blocks
     
-
-#
 # BlatUngappedBlock
-#
 
 class BlatUngappedBlock:
     """
@@ -87,8 +77,6 @@ class BlatUngappedBlock:
         self.qEnd = qEnd
         self.tStart = tStart
         self.tEnd = tEnd
-
-
 
     def __len__(self):
         return self.tEnd - self.tStart
@@ -101,7 +89,6 @@ class BlatUngappedBlock:
         t = seq2[self.tStart:self.tEnd]
 
         return (q, t)
-
 
 
 def calculate_end(Starts, blockSize):
@@ -162,6 +149,7 @@ def parse_blat(buf):
        # construct a list of tuples with each tuple containing
        # the i^th ungapped blocks's coords
        # i.e. qStarts[i], tStarts[i], qEnds[i], tEnds[i]
+       
        blocks = []  
        for i in range(0,len(qStarts)):
            blocks.append((qStarts[i], tStarts[i], qEnds[i], tEnds[i]))
@@ -213,7 +201,4 @@ def create_NLMSA_blat(buf, seqDb,al):
     # build alignment
     al.build()
     return al
-
-        
-
-
+ 

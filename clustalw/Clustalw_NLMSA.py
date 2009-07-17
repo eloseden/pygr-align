@@ -1,4 +1,5 @@
-# Author: Eden T. Elos <eloseden@msu.edu>
+
+# Author: Eden T. Elos, <eloseden@msu.edu>
 # May28,08
 # ! /usr/bin/env python2.5
 
@@ -10,8 +11,6 @@ builds pygr NLMSAs with it. The module defines the following class:
 
 - `ClustalwResidues`, a single clustalw 'residue'/alignment block containing
   upto 60 residues from each sequence
-
-
 
 Functions:
 
@@ -141,7 +140,6 @@ class ClustalwResidues(object):
             ungapped_len.append(len(self.seqs[i])-gaps[i])
 
         return ungapped_len
-
          
 def read_clustalw(lines):
     """
@@ -205,8 +203,6 @@ def calc_total_length(clustal_res_list):
         total_lengths = [total_lengths[i] + ls[i] for i in range(0, len(ls))]
 
     return total_lengths
-        
-   
 
 def build_interval_list(a, b):
     """
@@ -243,7 +239,6 @@ def build_interval_list(a, b):
         
     return interval_list
 
-
 def build_clustalw_ivals(lines, seqDb):
     """
     Takes lines of a clustalw alignment file  as input and builds the
@@ -252,8 +247,7 @@ def build_clustalw_ivals(lines, seqDb):
 
     clustal_res_list = read_clustalw(lines)
     sequence_names = clustal_res_list[0].get_names() 
-
-    
+  
     for clu_res in clustal_res_list:    
         # build list of aligned sub-intervals
 
@@ -264,9 +258,9 @@ def build_clustalw_ivals(lines, seqDb):
         for i in range(0, len(seq)):
             
             ivals=[]
-            
             start1 = start_indices[i]
             stop1 = end_indices[i]
+            
             if start1 != stop1:
                 seq1_ival = seqDb[sequence_names[i]][start1:stop1+1]
                 seq1_ival_str = seq[i]
@@ -288,7 +282,6 @@ def build_clustalw_ivals(lines, seqDb):
                             
             yield ivals
                             
-   
 def create_NLMSA_clustalw(buf, seqDb,al):
     """
     Takes buffer of a clustalw alignment file, sequence db and NLMSA (al)

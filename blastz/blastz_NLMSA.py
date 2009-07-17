@@ -1,5 +1,5 @@
 
-# Author: Eden T. Elos <eloseden@msu.edu>
+# Author: Eden T. Elos, <eloseden@msu.edu>
 # June 17,08
 # ! /usr/bin/env python2.5
 
@@ -46,13 +46,9 @@ How To Use This Module
 
 __docformat__ = 'restructuredtext'
 
-
 from pygr import cnestedlist, seqdb
 
-
-#
 # BlastzLocalAlignment
-#
 
 class BlastzLocalAlignment:
     """
@@ -75,10 +71,7 @@ class BlastzLocalAlignment:
 
         self.blocks = blocks
     
-
-#
 # BlastzUngappedBlock
-#
 
 class BlastzUngappedBlock:
     """
@@ -103,8 +96,6 @@ class BlastzUngappedBlock:
         bot = seq2[self.start_bot:self.end_bot]
 
         return (top, bot)
-
-
 
 def find_lavmarkers(buf):
     """
@@ -139,8 +130,7 @@ def construct_coord(lav_marker_list):
             coords.append((lav_marker_list[i], lav_marker_list[i+1]))
             
     return coords
-        
-
+     
 def get_orient(records):
     """
     This is the orientation to be obtained from each lav block.
@@ -290,7 +280,6 @@ def build_blastz_ivals(buf, seqDb):
             ivals.append((ival1,ival2))
 
         yield ivals
-
   
 def create_NLMSA_blastz(buf, seqDb,al):
     """
@@ -304,6 +293,3 @@ def create_NLMSA_blastz(buf, seqDb,al):
     al.build()
     return al
             
-        
-
-

@@ -1,5 +1,5 @@
 
-# Author: Eden T. Elos <eloseden@msu.edu>
+# Author: Eden T. Elos, <eloseden@msu.edu>
 # July,01, 08
 # ! /usr/bin/env python2.5
 
@@ -9,8 +9,6 @@ LAGAN_NLMSA MODULE
 ===================
 A module that parses lagan output from lagan alignment program, and
 builds pygr NLMSAs with it. The module does not define any class.
-
-
 
 Functions:
 - `read_lagan()`: read aligned sequences from a lagan alignment file
@@ -22,6 +20,7 @@ Functions:
 - `create_NLMSA_lagan()`: takes buffer of a lagan alignment file,
   sequence db and NLMSA  as input and returns NLMSA
   
+
 How To Use This Module
 ======================
 (See the individual classes, methods, and attributes for details.)
@@ -38,7 +37,6 @@ How To Use This Module
 """
 
 __docformat__ = 'restructuredtext'
-
 
 from pygr import cnestedlist, seqdb
 
@@ -65,7 +63,6 @@ def read_lagan(buf):
     seqName2 = seqInfo2.split()[0]
     
     return seq_List, (seqName1, seqName2)
-
 
 def build_interval_list(a, b):
     """
@@ -102,7 +99,6 @@ def build_interval_list(a, b):
         
     return interval_list
 
-
 def build_lagan_ivals(buf, seqDb):
     """
     Takes a lagan alignment file buffer and sequence db as input and
@@ -132,6 +128,3 @@ def create_NLMSA_lagan(buf, seqDb,al):
     # build alignment
     al.build()
     return al
-
-
-    

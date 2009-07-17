@@ -1,5 +1,5 @@
 
-# Author: Eden T. Elos <eloseden@msu.edu>
+# Author: Eden T. Elos, <eloseden@msu.edu>
 # July,01, 08
 # ! /usr/bin/env python2.5
 
@@ -8,7 +8,6 @@ MLAGAN_NLMSA MODULE
 ===================
 A module that parses mlagan output from mlagan alignment program, and
 builds pygr NLMSAs with it. The module does not define any class.
-
 
 Functions:
 - `read_mlagan()`: read aligned sequences from a mlagan alignment file
@@ -39,7 +38,6 @@ How To Use This Module
 """
 
 __docformat__ = 'restructuredtext'
-
 
 from pygr import cnestedlist, seqdb
 
@@ -81,10 +79,7 @@ def find_markers(buf):
         index1 = buf.find('>',index1+1)
 
     return seqMarker_list, seqInfo_list
-     
-    
-    
-    
+
 def build_interval_list(a, b):
     """
     Hacky code to extract all ungapped aligned subintervals from a
@@ -144,7 +139,6 @@ def build_mlagan_ivals(buf, seqDb):
                 ivals.append((ival1, ival2))
         yield ivals
             
-
 def create_NLMSA_mlagan(buf, seqDb,al):
     """
     Takes mlagan alignment file buffer as input and creates and
@@ -156,4 +150,3 @@ def create_NLMSA_mlagan(buf, seqDb,al):
     # build alignment
     al.build()
     return al
-    
