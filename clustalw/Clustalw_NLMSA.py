@@ -1,9 +1,6 @@
-# Author Eden Elos
+# Author: Eden T. Elos <eloseden@msu.edu>
 # May28,08
-# create NLMSA from Clustalw alignment file
-
 # ! /usr/bin/env python2.5
-
 
 """
 CLUSTALW_NLMSA MODULE

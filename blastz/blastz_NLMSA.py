@@ -1,3 +1,4 @@
+
 # Author: Eden T. Elos <eloseden@msu.edu>
 # June 17,08
 # ! /usr/bin/env python2.5
@@ -260,8 +261,8 @@ def _parse_record(record, orient, sequence_name1, sequence_name2):
     
     return BlastzLocalAlignment(score,
                                 start_top - 1, end_top,
-                                start_bot - 1, end_bot,sequence_name1,sequence_name2,
-                                orient, blocks)
+                                start_bot - 1, end_bot, sequence_name1,
+                                sequence_name2, orient, blocks)
 
 def build_blastz_ivals(buf, seqDb):
     """

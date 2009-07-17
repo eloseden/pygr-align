@@ -1,9 +1,7 @@
-# Author Eden Elos
-# July,01
-# create NLMSA from lagan alignment file
 
+# Author: Eden T. Elos <eloseden@msu.edu>
+# July,01, 08
 # ! /usr/bin/env python2.5
-
 
 
 """

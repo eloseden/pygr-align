@@ -1,6 +1,6 @@
-# Author Eden Elos
+
+# Author: Eden T. Elos <eloseden@msu.edu>
 # June 29,08
-# create NLMSA from Blat alignment file
 # ! /usr/bin/env python2.5
 
 """

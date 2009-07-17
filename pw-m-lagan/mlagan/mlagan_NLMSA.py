@@ -1,10 +1,7 @@
 
-#Parse fasta output from mlagan, and build pygr NLMSAs with it
-
-#Author Eden Elos
-
-#July,01
-#! /usr/bin/env python2.5
+# Author: Eden T. Elos <eloseden@msu.edu>
+# July,01, 08
+# ! /usr/bin/env python2.5
 
 """
 MLAGAN_NLMSA MODULE
