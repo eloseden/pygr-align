@@ -7,7 +7,7 @@ import blat_NLMSA
 
 class Blat_test(unittest.TestCase):
     """
-    blat test class to test the various functions
+    Blat test class to test the various functions
     """
     def setUp(self):
         self.buf = open('output.psl').read()
@@ -75,7 +75,6 @@ class Blat_NLMSA_test(unittest.TestCase):
         
         alignment = cnestedlist.NLMSA('test', mode='memory', seqDict=self.db,
                                       use_virtual_lpo=True)
-        alignment += self.db[genome_names[0]]
 
 
 

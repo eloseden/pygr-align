@@ -3,8 +3,49 @@
 # create NLMSA from Blat alignment file
 # ! /usr/bin/env python2.5
 
-import os
-import glob
+"""
+BLAT_NLMSA MODULE
+===================
+A module that parses blat output from blat alignment program, and
+builds pygr NLMSAs with it. The module defines the following class:
+
+- `BlatLocalAlignment`, a blat gapped local alignment, consisting of
+  multiple ungapped blocks.
+
+
+
+Functions:
+
+- `parse_blat()`: takes a blat alignment buffer and returns a list of
+  BlastLocalAlignments and names of the sequences
+- `build_blat_ivals():`: takes blat file buffer and sequence db
+  as input and builds the ivals
+- `create_NLMSA_blat()`: takes blat alignment file buffer, sequence db and NLMSA
+  as input and returns a modified/built NLMSA
+
+ 
+
+How To Use This Module
+======================
+(See the individual classes, methods, and attributes for details.)
+
+1. Import it: ``import blat_NLMSA``.
+   You will also need to ``from pygr import cnestedlist, seqdb``.
+
+2. Obtain the NLMSA using create_NLMSA_blat(buf, seqDb, al)
+   function. One needs to pass blat output file object (buf), sequence
+   database(seqDb) and the NLMSA object (al) to the function and the
+   function returns the modified/built NLMSA.
+   ``nlmsa_aln = create_NLMSA_blat(buf, seqDb, al)``
+
+"""
+
+__docformat__ = 'restructuredtext'
+
+
+
+
+
 from pygr import cnestedlist, seqdb
 
 
@@ -76,7 +117,6 @@ def calculate_end(Starts, blockSize):
     return Ends
        
         
-
 def parse_blat(buf):
     """
     Takes a blat alignment buffer and returns a list of BlastLocalAlignments
@@ -137,21 +177,16 @@ def parse_blat(buf):
 
     return matches, list(seqs_names)
 
-def create_NLMSA_blat(buf, seqDb, al):
+def build_blat_ivals(buf, seqDb):
     """
-    takes blat file buffer as input and creates and returns NLMSA
+    Takes a blat file buffer and seq db as input and builds the ivals
     """
     blataln_list, seqs_names = parse_blat(buf)
     
-    #feed the sequences
-    for i in range(0,len(seqs_names)):
-        al += seqDb[seqs_names[i]]
-
-
     for blt_al in blataln_list:
         seqs_name1 = getattr(blt_al, "qSeqName")
         seqs_name2= getattr(blt_al, "tSeqName")
-            
+        ivals = []   
         block = getattr(blt_al, "blocks")
         for ungapped in block:
             
@@ -163,14 +198,22 @@ def create_NLMSA_blat(buf, seqDb, al):
 
             ival1 = seqDb[seqs_name1][a:b]
             ival2 = seqDb[seqs_name2][x:y]
+            ivals.append((ival1,ival2))
 
-            
-            al[ival1] += ival2
+        yield ivals
 
+def create_NLMSA_blat(buf, seqDb,al):
+    """
+    Takes a blat alignment file buffer, sequence db and NLMSA (al) as input
+    and returns a built NLMSA
+    """
+    for ivals in build_blat_ivals(buf, seqDb):
+       al.add_aligned_intervals(ivals)
+       
     # build alignment
     al.build()
     return al
-            
+
         
 
 

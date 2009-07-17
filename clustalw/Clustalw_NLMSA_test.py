@@ -95,15 +95,16 @@ class Clustalw_NLMSA_test(unittest.TestCase):
         self.db = seqdb.SequenceFileDB(os.path.join(thisdir,
                                                     'test_genomes_file'))
         
-        lines = open(os.path.join(thisdir, 'test_clustalw_alignment.aln'),"r").readlines()
-        clustal_res_list = Clustalw_NLMSA.read_clustalw(lines)
-        genome_names = clustal_res_list[0].get_names() 
+        buf = open(os.path.join(thisdir, 'test_clustalw_alignment.aln'),"r").read()
+        
+        clustal_res_list = Clustalw_NLMSA.read_clustalw(buf.split("\n"))
+        
        
 
         alignment = cnestedlist.NLMSA('test', mode='memory', seqDict=self.db,
                                       use_virtual_lpo=True)
     
-        self.temp_nlmsa = Clustalw_NLMSA.create_NLMSA_clustalw(lines, self.db,
+        self.temp_nlmsa = Clustalw_NLMSA.create_NLMSA_clustalw(buf, self.db,
                                                                alignment)
 
         

@@ -7,7 +7,7 @@ import blastz_NLMSA
 
 class Blastz_test(unittest.TestCase):
     """
-    blastz test class to test the various functions 
+    Blastz test class to test the various functions.
     """
     
     def setUp(self):
@@ -86,7 +86,6 @@ class Blastz_NLMSA_test(unittest.TestCase):
         
         alignment = cnestedlist.NLMSA('test', mode='memory', seqDict=self.db,
                                       use_virtual_lpo=True)
-        alignment += self.db[genome_names[0]]
 
         self.temp_nlmsa = blastz_NLMSA.create_NLMSA_blastz(self.buf,
                                                    self.db, alignment)

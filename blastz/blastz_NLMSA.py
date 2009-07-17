@@ -53,9 +53,6 @@ from pygr import cnestedlist, seqdb
 # BlastzLocalAlignment
 #
 
-
-
-
 class BlastzLocalAlignment:
     """
     A blastz gapped local alignment, consisting of multiple
@@ -266,23 +263,18 @@ def _parse_record(record, orient, sequence_name1, sequence_name2):
                                 start_bot - 1, end_bot,sequence_name1,sequence_name2,
                                 orient, blocks)
 
-        
-def create_NLMSA_blastz(buf, seqDb, al):
+def build_blastz_ivals(buf, seqDb):
     """
-    Takes blastz output file object/buffer as input and creates and returns NLMSA.
+    Takes blastz alignment file object as input and builds the
+    ivals
     """
-    
+
     blastzaln_list, seqs_names = parse_blastz(buf)
     
-    #feed the sequences
-    for i in range(0,len(seqs_names)):
-        al += seqDb[seqs_names[i]]
-
-
     for blz_al in blastzaln_list:
         sequence_name1 = getattr(blz_al, "sequence_name1")
         sequence_name2= getattr(blz_al, "sequence_name2")
-            
+        ivals = []    
         block = getattr(blz_al, "blocks")
         for ungapped in block:
             
@@ -294,9 +286,18 @@ def create_NLMSA_blastz(buf, seqDb, al):
 
             ival1 = seqDb[sequence_name1][a:b]
             ival2 = seqDb[sequence_name2][x:y]
+            ivals.append((ival1,ival2))
 
-            
-            al[ival1] += ival2
+        yield ivals
+
+  
+def create_NLMSA_blastz(buf, seqDb,al):
+    """
+    Takes blastz output file object/buffer as input and creates and
+    returns NLMSA.
+    """
+    for ivals in build_blastz_ivals(buf, seqDb):
+       al.add_aligned_intervals(ivals)
 
     # build alignment
     al.build()

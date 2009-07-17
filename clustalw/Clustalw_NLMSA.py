@@ -4,8 +4,48 @@
 
 # ! /usr/bin/env python2.5
 
-import os
-import glob
+
+"""
+CLUSTALW_NLMSA MODULE
+===================
+A module that parses clustalw output from clustalw alignment program, and
+builds pygr NLMSAs with it. The module defines the following class:
+
+- `ClustalwResidues`, a single clustalw 'residue'/alignment block containing
+  upto 60 residues from each sequence
+
+
+
+Functions:
+
+- `read_clustalw()`: read aligned sequences from a CLUSTALW alignment file
+  buffer 
+- `build_interval_list`, extract all ungapped aligned subintervals from a
+  pair of aligned sequences
+- `build_clustalw_ivals`, takes lines of a clustalw alignment file and
+  sequence db as input and builds the ivals
+- `create_NLMSA_clustalw`, takes buffer of a clustalw alignment file,
+  sequence db and NLMSA  as input and returns NLMSA
+
+
+How To Use This Module
+======================
+(See the individual classes, methods, and attributes for details.)
+
+1. Import it: ``import clustalw_NLMSA``.
+   You will also need to ``from pygr import cnestedlist, seqdb``.
+
+2. Obtain the NLMSA using create_NLMSA_clustalw(buf, seqDb, al)
+   function. One needs to pass blat output file object (buf), sequence
+   database(seqDb) and the NLMSA object (al) to the function and the
+   function returns the modified/built NLMSA.
+   ``nlmsa_aln = create_NLMSA_clustalw(buf, seqDb, al)``
+
+"""
+
+__docformat__ = 'restructuredtext'
+
+
 from pygr import cnestedlist, seqdb
 
 class ClustalwResidues(object):
@@ -27,28 +67,28 @@ class ClustalwResidues(object):
 
     def get_no_seqs(self):
         """
-        returns the number of sequences in the alignment block
+        Returns the number of sequences in the alignment block
         """
 
         return self.no_seq
 
     def get_names(self):
         """
-        returns list of sequence names
+        Returns list of sequence names
         """
 
         return self.seq_names
 
     def get_seqs(self):
         """
-        returns list of sequence
+        Returns list of sequence
         """
 
         return self.seqs
 
     def get_start_indices(self):
         """
-        returns list of  start indices for each
+        Returns list of  start indices for each
         sequence in the alignment block 
         """
 
@@ -56,7 +96,7 @@ class ClustalwResidues(object):
 
     def reset_start_indices(self):
         """
-        reset the start indices if the sequence in the
+        Reset the start indices if the sequence in the
         alignment block is all gaps this is done by
         subtracting 1 from corresponding start_indices...
         """
@@ -68,7 +108,7 @@ class ClustalwResidues(object):
 
     def get_end_indices(self):
         """
-        returns list of end indices of each sequence in the alignment block.
+        Returns list of end indices of each sequence in the alignment block.
         """
 
         ungapped_lens = self.ungapped_count()
@@ -83,7 +123,7 @@ class ClustalwResidues(object):
         
     def gap_count(self):
         """
-        returns the number of gaps in each sequence
+        Returns the number of gaps in each sequence
         """
 
         gaps = []
@@ -94,7 +134,7 @@ class ClustalwResidues(object):
 
     def ungapped_count(self):
         """
-        returns the ungapped length
+        Returns the ungapped length
         """
 
         ungapped_len = []
@@ -209,16 +249,14 @@ def build_interval_list(a, b):
 
 def build_clustalw_ivals(lines, seqDb):
     """
-    takes lines of a clustalw alignment file  as input and builds the
+    Takes lines of a clustalw alignment file  as input and builds the
     ivals
     """
 
     clustal_res_list = read_clustalw(lines)
     sequence_names = clustal_res_list[0].get_names() 
 
-    # feed the alignment
-    #al += seqDb[sequence_names[0]]
-
+    
     for clu_res in clustal_res_list:    
         # build list of aligned sub-intervals
 
@@ -254,11 +292,13 @@ def build_clustalw_ivals(lines, seqDb):
             yield ivals
                             
    
-def create_NLMSA_clustalw(lines, seqDb,al):
+def create_NLMSA_clustalw(buf, seqDb,al):
     """
-    takes lines of a clustalw alignment file  as input and creates and
-    returns NLMSA
+    Takes buffer of a clustalw alignment file, sequence db and NLMSA (al)
+    as input and returns NLMSA
     """
+    
+    lines = buf.split("\n")
     for ivals in build_clustalw_ivals(lines, seqDb):
        al.add_aligned_intervals(ivals)
     al.build()
