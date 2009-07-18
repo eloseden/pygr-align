@@ -12,8 +12,6 @@ builds pygr NLMSAs with it. The module defines the following class:
 - `BlatLocalAlignment`, a blat gapped local alignment, consisting of
   multiple ungapped blocks.
 
-
-
 Functions:
 
 - `parse_blat()`: takes a blat alignment buffer and returns a list of
@@ -42,7 +40,8 @@ How To Use This Module
 
 __docformat__ = 'restructuredtext'
 
-from pygr import cnestedlist, seqdb
+from pygr import cnestedlist , seqdb
+from pygr.nlmsa_utils import *
 
 # BlatLocalAlignment
 
@@ -72,11 +71,12 @@ class BlatUngappedBlock:
     """
     A single ungapped block in a blat alignment.
     """
-    def __init__(self, qStart, qEnd, tStart, tEnd):
+    def __init__(self, qStart, qEnd, tStart, tEnd, orient):
         self.qStart = qStart
         self.qEnd = qEnd
         self.tStart = tStart
         self.tEnd = tEnd
+        self.orient = orient
 
     def __len__(self):
         return self.tEnd - self.tStart
@@ -90,7 +90,6 @@ class BlatUngappedBlock:
 
         return (q, t)
 
-
 def calculate_end(Starts, blockSize):
     """
     Calculate the end coordinates of ungapped blocks
@@ -103,7 +102,6 @@ def calculate_end(Starts, blockSize):
 
     return Ends
        
-        
 def parse_blat(buf):
     """
     Takes a blat alignment buffer and returns a list of BlastLocalAlignments
@@ -152,10 +150,10 @@ def parse_blat(buf):
        
        blocks = []  
        for i in range(0,len(qStarts)):
-           blocks.append((qStarts[i], tStarts[i], qEnds[i], tEnds[i]))
+           blocks.append((qStarts[i], tStarts[i], qEnds[i], tEnds[i], orient))
 
-       blocks = [ BlatUngappedBlock(a, c, b, d) \
-               for (a, b, c, d) in blocks ]
+       blocks = [ BlatUngappedBlock(a, c, b, d, ori) \
+               for (a, b, c, d, ori) in blocks ]
 
 
        blatLocalAln = BlatLocalAlignment(qStart, qEnd, tStart, tEnd,
@@ -173,7 +171,7 @@ def build_blat_ivals(buf, seqDb):
     
     for blt_al in blataln_list:
         seqs_name1 = getattr(blt_al, "qSeqName")
-        seqs_name2= getattr(blt_al, "tSeqName")
+        seqs_name2 = getattr(blt_al, "tSeqName")
         ivals = []   
         block = getattr(blt_al, "blocks")
         for ungapped in block:
@@ -184,9 +182,11 @@ def build_blat_ivals(buf, seqDb):
             x = getattr(ungapped, "tStart")
             y = getattr(ungapped, "tEnd")
 
-            ival1 = seqDb[seqs_name1][a:b]
-            ival2 = seqDb[seqs_name2][x:y]
-            ivals.append((ival1,ival2))
+            orient = getattr(ungapped, "orient")
+            
+            ival1 = (seqs_name1, a, b, orient)
+            ival2 = (seqs_name2, x, y, orient)
+            ivals.append((ival1, ival2))
 
         yield ivals
 
@@ -196,9 +196,12 @@ def create_NLMSA_blat(buf, seqDb,al):
     and returns a built NLMSA
     """
     for ivals in build_blat_ivals(buf, seqDb):
-       al.add_aligned_intervals(ivals)
-       
-    # build alignment
+        al.add_aligned_intervals(alignedIvals=ivals, alignedIvalsSrc=seqDb, 
+                                alignedIvalsDest=seqDb,
+                                alignedIvalsAttrs=dict(id=0, start=1,
+                                stop=2, ori=3, idDest=0, startDest=1,
+                                stopDest=2, oriDest=3))
+    #build alignment
     al.build()
     return al
  
