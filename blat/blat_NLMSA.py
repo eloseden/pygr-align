@@ -40,8 +40,7 @@ How To Use This Module
 
 __docformat__ = 'restructuredtext'
 
-from pygr import cnestedlist , seqdb
-from pygr.nlmsa_utils import *
+from pygr import cnestedlist, nlmsa_utils, seqdb
 
 # BlatLocalAlignment
 
@@ -196,11 +195,12 @@ def create_NLMSA_blat(buf, seqDb,al):
     and returns a built NLMSA
     """
     for ivals in build_blat_ivals(buf, seqDb):
-        al.add_aligned_intervals(alignedIvals=ivals, alignedIvalsSrc=seqDb, 
-                                alignedIvalsDest=seqDb,
-                                alignedIvalsAttrs=dict(id=0, start=1,
-                                stop=2, ori=3, idDest=0, startDest=1,
-                                stopDest=2, oriDest=3))
+        alignedIvalsAttrs = dict(id=0, start=1, stop=2, idDest=0, startDest=1,
+                                 stopDest=2, ori=3, oriDest=3)
+        cti = nlmsa_utils.CoordsToIntervals(seqDb, seqDb,
+                                            alignedIvalsAttrs)
+        al.add_aligned_intervals(cti(ivals))
+        
     #build alignment
     al.build()
     return al

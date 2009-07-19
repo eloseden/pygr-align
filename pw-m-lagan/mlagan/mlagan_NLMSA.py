@@ -10,6 +10,7 @@ A module that parses mlagan output from mlagan alignment program, and
 builds pygr NLMSAs with it. The module does not define any class.
 
 Functions:
+
 - `read_mlagan()`: read aligned sequences from a mlagan alignment file
   buffer
 - `find_markers()`: find the > markers in the mlagan alignment buffer and
@@ -39,7 +40,7 @@ How To Use This Module
 
 __docformat__ = 'restructuredtext'
 
-from pygr import cnestedlist, seqdb
+from pygr import cnestedlist, nlmsa_utils, seqdb
 
 def read_mlagan(buf):
     """
@@ -134,8 +135,8 @@ def build_mlagan_ivals(buf, seqDb):
             interval_list = build_interval_list(seqs1_ival_str,
                                                     seqs2_ival_str)
             for (a, b, x, y) in interval_list:
-                ival1 = seqs1_ival[a:b]
-                ival2 = seqs2_ival[x:y]
+                ival1 = (seqNames[i], a, b)
+                ival2 = (seqNames[j], x, y)
                 ivals.append((ival1, ival2))
         yield ivals
             
@@ -145,7 +146,12 @@ def create_NLMSA_mlagan(buf, seqDb,al):
     returns NLMSA
     """
     for ivals in build_mlagan_ivals(buf, seqDb):
-       al.add_aligned_intervals(ivals)
+        alignedIvalsAttrs = dict(id=0, start=1, stop=2, idDest=0, 
+                                 startDest=1, stopDest=2)
+        cti = nlmsa_utils.CoordsToIntervals(seqDb, seqDb,
+                                            alignedIvalsAttrs)
+        al.add_aligned_intervals(cti(ivals))
+
 
     # build alignment
     al.build()

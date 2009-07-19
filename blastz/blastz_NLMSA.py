@@ -46,7 +46,7 @@ How To Use This Module
 
 __docformat__ = 'restructuredtext'
 
-from pygr import cnestedlist, seqdb
+from pygr import cnestedlist, nlmsa_utils, seqdb
 
 # BlastzLocalAlignment
 
@@ -66,7 +66,6 @@ class BlastzLocalAlignment:
         self.sequence_name1 = sequence_name1
         self.sequence_name2 = sequence_name2
         
-        assert abs(orient) == 1
         self.orient = orient
 
         self.blocks = blocks
@@ -131,12 +130,17 @@ def construct_coord(lav_marker_list):
             
     return coords
      
-def get_orient(records):
+def get_orient(lav_counter, total_lav):
     """
-    This is the orientation to be obtained from each lav block.
-    The orientation information is yet to be used properly.
+    Orientation obtained from each lav block.
+    The first lav block has orientation 1 (forward) alignment and the 
+    next (if it exists) has orientation as -1 (reverse).
     """
-    orient = 1
+    assert total_lav <= 2 and total_lav > 0
+    if lav_counter == 1:
+        orient = 1
+    else:
+        orient = -1
     return orient
 
 def get_names(records):
@@ -175,12 +179,14 @@ def parse_blastz(buf):
 
     seqs_names = set()
     matches = []
+    lav_counter = 0
     for coord in lav_coords:
+        lav_counter += 1
         start_index = int(coord[0])
         end_index = int(coord[1])
         lav_block = buf[start_index:end_index]
         records = lav_block.split('\n}\n')
-        orient = get_orient(records)
+        orient = get_orient(lav_counter, len(lav_coords))
         names = get_names(records)
         seqs_names = seqs_names.union(set(names))
         matches.extend(_parse_blastz_record_block(records, orient, names[0],
@@ -265,8 +271,10 @@ def build_blastz_ivals(buf, seqDb):
     for blz_al in blastzaln_list:
         sequence_name1 = getattr(blz_al, "sequence_name1")
         sequence_name2= getattr(blz_al, "sequence_name2")
+        orient = getattr(blz_al,"orient")
+        block = getattr(blz_al, "blocks")        
+        
         ivals = []    
-        block = getattr(blz_al, "blocks")
         for ungapped in block:
             
             a = getattr(ungapped, "start_top")
@@ -275,8 +283,8 @@ def build_blastz_ivals(buf, seqDb):
             x = getattr(ungapped, "start_bot")
             y = getattr(ungapped, "end_bot")
 
-            ival1 = seqDb[sequence_name1][a:b]
-            ival2 = seqDb[sequence_name2][x:y]
+            ival1 = (sequence_name1, a, b, orient)
+            ival2 = (sequence_name2, x, y, orient)
             ivals.append((ival1,ival2))
 
         yield ivals
@@ -287,7 +295,12 @@ def create_NLMSA_blastz(buf, seqDb,al):
     returns NLMSA.
     """
     for ivals in build_blastz_ivals(buf, seqDb):
-       al.add_aligned_intervals(ivals)
+        alignedIvalsAttrs = dict(id=0, start=1, stop=2, idDest=0, startDest=1,
+                                 stopDest=2, ori=3, oriDest=3)
+        cti = nlmsa_utils.CoordsToIntervals(seqDb, seqDb,
+                                            alignedIvalsAttrs)
+        al.add_aligned_intervals(cti(ivals))
+        
 
     # build alignment
     al.build()

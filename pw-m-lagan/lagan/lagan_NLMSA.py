@@ -11,6 +11,7 @@ A module that parses lagan output from lagan alignment program, and
 builds pygr NLMSAs with it. The module does not define any class.
 
 Functions:
+
 - `read_lagan()`: read aligned sequences from a lagan alignment file
   buffer
 - `build_interval_list()`: extract all ungapped aligned subintervals from
@@ -38,7 +39,7 @@ How To Use This Module
 
 __docformat__ = 'restructuredtext'
 
-from pygr import cnestedlist, seqdb
+from pygr import cnestedlist, nlmsa_utils, seqdb
 
 def read_lagan(buf):
     """
@@ -111,10 +112,10 @@ def build_lagan_ivals(buf, seqDb):
     interval_list = build_interval_list(seqList[0], seqList[1])
     ivals = []
     for (a, b, x, y) in interval_list:
-             ival1 = seqDb[seqNames[0]][a:b]
-             ival2 = seqDb[seqNames[1]][x:y]
-             ivals.append((ival1,ival2))
-
+             ival1 = (seqNames[0], a, b)
+             ival2 = (seqNames[1], x, y)
+             ivals.append((ival1, ival2))
+    
     yield ivals
 
 def create_NLMSA_lagan(buf, seqDb,al):
@@ -123,7 +124,11 @@ def create_NLMSA_lagan(buf, seqDb,al):
     returns NLMSA
     """
     for ivals in build_lagan_ivals(buf, seqDb):
-       al.add_aligned_intervals(ivals)
+        alignedIvalsAttrs = dict(id=0, start=1, stop=2, idDest=0, 
+                                 startDest=1, stopDest=2)
+        cti = nlmsa_utils.CoordsToIntervals(seqDb, seqDb,
+                                            alignedIvalsAttrs)
+        al.add_aligned_intervals(cti(ivals))
 
     # build alignment
     al.build()

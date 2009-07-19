@@ -42,7 +42,7 @@ How To Use This Module
 __docformat__ = 'restructuredtext'
 
 
-from pygr import cnestedlist, seqdb
+from pygr import cnestedlist, nlmsa_utils, seqdb
 
 class ClustalwResidues(object):
     
@@ -247,40 +247,38 @@ def build_clustalw_ivals(lines, seqDb):
 
     clustal_res_list = read_clustalw(lines)
     sequence_names = clustal_res_list[0].get_names() 
-  
+    
     for clu_res in clustal_res_list:    
         # build list of aligned sub-intervals
 
         seq = clu_res.get_seqs()
         start_indices = clu_res.get_start_indices()
         end_indices = clu_res.get_end_indices()
-           
+        ivals = []
+          
         for i in range(0, len(seq)):
             
-            ivals=[]
             start1 = start_indices[i]
             stop1 = end_indices[i]
             
             if start1 != stop1:
-                seq1_ival = seqDb[sequence_names[i]][start1:stop1+1]
                 seq1_ival_str = seq[i]
         
                 for j in range(i+1, len(seq)):
                     start2 = start_indices[j]
                     stop2 = end_indices[j]
                     if start2 != stop2:
-                        seq2_ival = seqDb[sequence_names[j]][start2:stop2+1]
                         seq2_ival_str = seq[j]
                 
                         interval_list = build_interval_list(seq1_ival_str,
                                                             seq2_ival_str)
-
+                           
                         for (a, b, x, y) in interval_list:
-                            ival1 = seq1_ival[a:b]
-                            ival2 = seq2_ival[x:y]
-                            ivals.append((ival1,ival2))
-                            
-            yield ivals
+                            ival1 = (sequence_names[i], start1+a, start1+b)
+                            ival2 = (sequence_names[j], start2+x, start2+y)
+                            ivals.append((ival1, ival2))
+        
+        yield ivals
                             
 def create_NLMSA_clustalw(buf, seqDb,al):
     """
@@ -290,6 +288,11 @@ def create_NLMSA_clustalw(buf, seqDb,al):
     
     lines = buf.split("\n")
     for ivals in build_clustalw_ivals(lines, seqDb):
-       al.add_aligned_intervals(ivals)
+        alignedIvalsAttrs = dict(id=0, start=1, stop=2, idDest=0, 
+                                 startDest=1, stopDest=2)
+        cti = nlmsa_utils.CoordsToIntervals(seqDb, seqDb,
+                                            alignedIvalsAttrs)
+        al.add_aligned_intervals(cti(ivals))
+        
     al.build()
     return al
