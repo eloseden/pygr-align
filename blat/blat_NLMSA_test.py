@@ -51,7 +51,7 @@ class Blat_test(unittest.TestCase):
         self.assertEqual(tEnd, 350)
         self.assertEqual(qName, 'testgenome4')
         self.assertEqual(tName, 'testgenome1')
-        self.assertEqual(orient, 1)
+        self.assertEqual(orient, '++')
         self.assertEqual(len(blocks), 2)
         
         self.assertEqual(last_ungapped_qStart, 351)

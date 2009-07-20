@@ -124,10 +124,10 @@ def parse_blat(buf):
     records = [ i.strip().split('\t') for i in records ]
     for record in records:
        # orientation information is not yet used in the NLMSA
-       if record[8] == '+':
-           orient = 1
+       if len(record[8]) == 1:
+           orient = record[8]+record[8]
        else:
-           orient = -1
+           orient = record[8]
            
        qName = record[9]
        tName = record[13]
@@ -183,8 +183,19 @@ def build_blat_ivals(buf, seqDb):
 
             orient = getattr(ungapped, "orient")
             
-            ival1 = (seqs_name1, a, b, orient)
-            ival2 = (seqs_name2, x, y, orient)
+            if orient[0] == '+':
+                orient1 = 1
+            else:
+                orient1 = -1
+            
+            if orient[1] == '+':
+                orient2 = 1
+            else:
+                orient2 = -1
+            
+            ival1 = (seqs_name1, a, b, orient1)
+            ival2 = (seqs_name2, x, y, orient2)
+            
             ivals.append((ival1, ival2))
 
         yield ivals
