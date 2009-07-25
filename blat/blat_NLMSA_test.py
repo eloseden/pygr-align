@@ -78,11 +78,9 @@ class Blat_NLMSA_test(unittest.TestCase):
 
 
 
-        self.temp_nlmsa = blat_NLMSA.create_NLMSA_blat(self.buf,
-                                                   self.db, alignment)
+        self.temp_nlmsa = blat_NLMSA.create_NLMSA_blat(self.buf, self.db, 
+                                                         alignment)
     
-        
-        
 
     def test_align_manual1(self):
         """

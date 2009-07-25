@@ -40,7 +40,7 @@ How To Use This Module
 
 __docformat__ = 'restructuredtext'
 
-from pygr import cnestedlist, nlmsa_utils, seqdb
+from pygr import cnestedlist, nlmsa_utils, seqdb, translationDB
 
 # BlatLocalAlignment
 
@@ -162,9 +162,9 @@ def parse_blat(buf):
 
     return matches, list(seqs_names)
 
-def build_blat_ivals(buf, seqDb):
+def build_blat_ivals(buf):
     """
-    Takes a blat file buffer and seq db as input and builds the ivals
+    Takes a blat file buffer as input and builds the ivals
     """
     blataln_list, seqs_names = parse_blat(buf)
     
@@ -205,7 +205,7 @@ def create_NLMSA_blat(buf, seqDb,al):
     Takes a blat alignment file buffer, sequence db and NLMSA (al) as input
     and returns a built NLMSA
     """
-    for ivals in build_blat_ivals(buf, seqDb):
+    for ivals in build_blat_ivals(buf):
         alignedIvalsAttrs = dict(id=0, start=1, stop=2, idDest=0, startDest=1,
                                  stopDest=2, ori=3, oriDest=3)
         cti = nlmsa_utils.CoordsToIntervals(seqDb, seqDb,
@@ -216,3 +216,21 @@ def create_NLMSA_blat(buf, seqDb,al):
     al.build()
     return al
  
+def create_NLMSA_tblat(buf, srcDB, destDB, al):
+    """
+    Takes a blat alignment file buffer, srcDB, destDB and NLMSA (al) as input
+    and returns a built NLMSA
+    """
+    #srcDB = translationDB.get_translation_db(srcDB)
+    destDB = translationDB.get_translation_db(destDB)
+    for ivals in build_blat_ivals(buf):
+        alignedIvalsAttrs = dict(id=0, start=1, stop=2, idDest=0, startDest=1,
+                                 stopDest=2, ori=3, oriDest=3)        
+        
+        cti = nlmsa_utils.CoordsToIntervals(srcDB, destDB,
+                                            alignedIvalsAttrs)
+        al.add_aligned_intervals(cti(ivals))
+        
+    #build alignment
+    al.build()
+    return al
