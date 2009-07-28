@@ -89,22 +89,24 @@ class BlatUngappedBlock:
 
         return (q, t)
 
-def calculate_end(Starts, blockSize):
+def calculate_end(Starts, blockSize, aln_type):
     """
     Calculate the end coordinates of ungapped blocks
     """
-    
     Ends = []
           
     for i in range(0, len(blockSize)):
-        Ends.append(int(Starts[i]) + int(blockSize[i]))
+        if aln_type:
+            Ends.append(int(Starts[i]) + 3*int(blockSize[i]))
+        else:
+            Ends.append(int(Starts[i]) + int(blockSize[i]))
 
     return Ends
        
-def parse_blat(buf):
+def parse_blat(buf, aln_type):
     """
-    Takes a blat alignment buffer and returns a list of BlastLocalAlignments
-    and names of the sequences.
+    Takes a blat alignment buffer and aln_type and returns a list 
+    of BlastLocalAlignments and names of the sequences.
     """
 
     assert buf[0:8] == 'psLayout', " This is not a blat alignment file"
@@ -122,10 +124,11 @@ def parse_blat(buf):
     # of the default blat alignment output.
     
     records = [ i.strip().split('\t') for i in records ]
+    
     for record in records:
-       # orientation information is not yet used in the NLMSA
+       # Extracting orientation information 
        if len(record[8]) == 1:
-           orient = record[8]+record[8]
+           orient = record[8] + record[8]
        else:
            orient = record[8]
            
@@ -139,8 +142,8 @@ def parse_blat(buf):
        blockSize = map(int, record[18].strip(',').split(','))
        qStarts = map(int, record[19].strip(',').split(','))       
        tStarts = map(int, record[20].strip(',').split(','))
-       qEnds = map(int, calculate_end(qStarts, blockSize))
-       tEnds = map(int, calculate_end(tStarts, blockSize))
+       qEnds = map(int, calculate_end(qStarts, blockSize, 0))
+       tEnds = map(int, calculate_end(tStarts, blockSize, aln_type))
        seqs_names = seqs_names.union(set([qName, tName]))
 
        # construct a list of tuples with each tuple containing
@@ -148,12 +151,11 @@ def parse_blat(buf):
        # i.e. qStarts[i], tStarts[i], qEnds[i], tEnds[i]
        
        blocks = []  
-       for i in range(0,len(qStarts)):
+       for i in range(0, len(qStarts)):
            blocks.append((qStarts[i], tStarts[i], qEnds[i], tEnds[i], orient))
 
        blocks = [ BlatUngappedBlock(a, c, b, d, ori) \
                for (a, b, c, d, ori) in blocks ]
-
 
        blatLocalAln = BlatLocalAlignment(qStart, qEnd, tStart, tEnd,
                                        qName, tName, orient, blocks)
@@ -162,19 +164,19 @@ def parse_blat(buf):
 
     return matches, list(seqs_names)
 
-def build_blat_ivals(buf):
+def build_blat_ivals(buf, aln_type):
     """
-    Takes a blat file buffer as input and builds the ivals
+    Takes a blat file buffer and aln_type as input and builds the ivals
     """
-    blataln_list, seqs_names = parse_blat(buf)
+    blataln_list, seqs_names = parse_blat(buf, aln_type)
     
     for blt_al in blataln_list:
         seqs_name1 = getattr(blt_al, "qSeqName")
         seqs_name2 = getattr(blt_al, "tSeqName")
         ivals = []   
         block = getattr(blt_al, "blocks")
+        
         for ungapped in block:
-            
             a = getattr(ungapped, "qStart")
             b = getattr(ungapped, "qEnd")
             
@@ -200,34 +202,29 @@ def build_blat_ivals(buf):
 
         yield ivals
 
-def create_NLMSA_blat(buf, seqDb,al):
+def create_NLMSA_blat(buf, al, aln_type=None, seqDB=None, srcDB=None, destDB=None):
     """
-    Takes a blat alignment file buffer, sequence db and NLMSA (al) as input
-    and returns a built NLMSA
+    Takes a blat alignment file buffer, NLMSA (al), aln_type, srcDB and destDB 
+    as input and returns a built NLMSA
+    aln_blat - optional arg with 1 denoting protein-dna alignment and 
+    anything else(0 or None) denoting protein-protein or dna-dna alignments 
     """
-    for ivals in build_blat_ivals(buf):
-        alignedIvalsAttrs = dict(id=0, start=1, stop=2, idDest=0, startDest=1,
-                                 stopDest=2, ori=3, oriDest=3)
-        cti = nlmsa_utils.CoordsToIntervals(seqDb, seqDb,
-                                            alignedIvalsAttrs)
-        al.add_aligned_intervals(cti(ivals))
-        
-    #build alignment
-    al.build()
-    return al
- 
-def create_NLMSA_tblat(buf, srcDB, destDB, al):
-    """
-    Takes a blat alignment file buffer, srcDB, destDB and NLMSA (al) as input
-    and returns a built NLMSA
-    """
-    #srcDB = translationDB.get_translation_db(srcDB)
-    destDB = translationDB.get_translation_db(destDB)
-    for ivals in build_blat_ivals(buf):
+    if destDB:
+        destDB = translationDB.get_translation_db(destDB)
+    if aln_type:
+        ivals_list = build_blat_ivals(buf, aln_type)
+    else:
+        ivals_list = build_blat_ivals(buf, 0)
+   
+    for ivals in ivals_list:
         alignedIvalsAttrs = dict(id=0, start=1, stop=2, idDest=0, startDest=1,
                                  stopDest=2, ori=3, oriDest=3)        
         
-        cti = nlmsa_utils.CoordsToIntervals(srcDB, destDB,
+        if seqDB:
+            cti = nlmsa_utils.CoordsToIntervals(seqDB, seqDB,
+                                            alignedIvalsAttrs)
+        else:
+            cti = nlmsa_utils.CoordsToIntervals(srcDB, destDB,
                                             alignedIvalsAttrs)
         al.add_aligned_intervals(cti(ivals))
         

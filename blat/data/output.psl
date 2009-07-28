@@ -1,0 +1,9 @@
+psLayout version 3
+
+match	mis- 	rep. 	N's	Q gap	Q gap	T gap	T gap	strand	Q        	Q   	Q    	Q  	T        	T   	T    	T  	block	blockSizes 	qStarts	 tStarts
+     	match	match	   	count	bases	count	bases	      	name     	size	start	end	name     	size	start	end	count
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+280	0	0	0	1	70	0	0	+	testgenome2	408	0	350	testgenome1	416	70	350	2	140,140,	0,210,	70,210,
+58	0	0	0	0	0	0	0	+	testgenome2	408	140	198	testgenome1	416	222	280	1	58,	140,	222,
+280	0	0	0	2	140	0	0	+	testgenome3	420	0	420	testgenome1	416	70	350	3	70,140,70,	0,140,350,	70,140,280,
+286	0	0	0	1	70	0	0	+	testgenome4	420	64	420	testgenome1	416	64	350	2	217,69,	64,351,	64,281,
