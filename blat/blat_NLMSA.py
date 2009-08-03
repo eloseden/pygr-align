@@ -209,23 +209,19 @@ def create_NLMSA_blat(buf, al, aln_type=None, seqDB=None, srcDB=None, destDB=Non
     aln_blat - optional arg with 1 denoting protein-dna alignment and 
     anything else(0 or None) denoting protein-protein or dna-dna alignments 
     """
-    if destDB:
-        destDB = translationDB.get_translation_db(destDB)
-    if aln_type:
-        ivals_list = build_blat_ivals(buf, aln_type)
+    ivals_list = build_blat_ivals(buf, aln_type)
+
+    alignedIvalsAttrs = dict(id=0, start=1, stop=2, idDest=0, startDest=1,
+                             stopDest=2, ori=3, oriDest=3)        
+
+    if seqDB:
+        cti = nlmsa_utils.CoordsToIntervals(seqDB, seqDB,
+                                            alignedIvalsAttrs)
     else:
-        ivals_list = build_blat_ivals(buf, 0)
-   
-    for ivals in ivals_list:
-        alignedIvalsAttrs = dict(id=0, start=1, stop=2, idDest=0, startDest=1,
-                                 stopDest=2, ori=3, oriDest=3)        
+        cti = nlmsa_utils.CoordsToIntervals(srcDB, destDB,
+                                        alignedIvalsAttrs)
         
-        if seqDB:
-            cti = nlmsa_utils.CoordsToIntervals(seqDB, seqDB,
-                                            alignedIvalsAttrs)
-        else:
-            cti = nlmsa_utils.CoordsToIntervals(srcDB, destDB,
-                                            alignedIvalsAttrs)
+    for ivals in ivals_list:
         al.add_aligned_intervals(cti(ivals))
         
     #build alignment

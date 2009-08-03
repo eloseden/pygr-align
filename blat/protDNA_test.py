@@ -68,68 +68,45 @@ class Blat_test(unittest.TestCase):
         self.assertEqual(last_ungapped_tEnd, 246+3*25)
 
 
-def translator(prot_db, dna_db, of):
-    """
-    Iterate over the frames of translated dna and write them to a single output 
-    fasta format file
-    """
-    t_dna_db = translationDB.get_translation_db(dna_db)
-    
-    for name in dna_db.keys():
-        dna_seq = dna_db[name]
-        for i in range(0,3):
-            cur_frame = t_dna_db.annodb[dna_seq.id + ':' + str(i)]
-            of.write(">" + name + ":" + str(i) + "\n")
-            of.write(str(cur_frame) + "\n")
-        for i in range(0,3):
-            cur_frame = t_dna_db.annodb[dna_seq.id + ':-' + str(i)]
-            of.write(">" + name + ":" + '-' + str(i) + "\n")
-            of.write(str(cur_frame) + "\n")
-    for name in prot_db.keys():
-        prot_seq = prot_db[name]
-        of.write(">" + name + "\n")
-        of.write(str(prot_db[name])+ "\n")
-        
 class Blat_NLMSA_test(unittest.TestCase):
 
     def setUp(self):
         
         self.buf = open('data/ProtDNA.psl').read()
         self.buf = self.buf.replace("\r\n","\n")
-        
+
         thisdir = os.path.abspath(os.path.dirname(__file__))
+        def thisfile(name):
+            return os.path.join(thisdir, name)
         
-        self.srcDB = seqdb.SequenceFileDB(os.path.join(thisdir,
-                                                    'data/test_prot.fa'))
-        self.destDB = seqdb.SequenceFileDB(os.path.join(thisdir,
-                                                    'data/test_dna.fa'))
-        of  = open('data/translatedDB.fa','w')
-        translator(self.srcDB, self.destDB, of)
-        of.close()
         
-        self.db = seqdb.SequenceFileDB(os.path.join(thisdir,
-                                                    'data/translatedDB.fa'))
+        self.srcDB = seqdb.SequenceFileDB(thisfile('data/test_prot.fa'))
+        self.destDB = seqdb.SequenceFileDB(thisfile('data/test_dna.fa'))
+        self.db = seqdb.SequenceFileDB(thisfile('data/translatedDB.fa'))
+        
         self.aln_type = 1 #protein-dna alignmet = 1, else - 0 
         
         self.matches, genome_names = blat_NLMSA.parse_blat(self.buf, 
-                                                                self.aln_type)
-        
+                                                           self.aln_type)
+
+        self.db = translationDB.get_translation_db(self.destDB)
+
         alignment = cnestedlist.NLMSA('test', mode='memory', pairwiseMode=True,
-                               bidirectional=False, seqDict=self.db)
+                                      bidirectional=False)
 
         self.temp_nlmsa = blat_NLMSA.create_NLMSA_blat(self.buf, alignment,
                                                        aln_type = self.aln_type,        
                                                        srcDB = self.srcDB, 
-                                                       destDB = self.destDB)
+                                                       destDB = self.db)
     
     def test_align_manual1(self):
         """
         In this test, alignments from Protein/DNA blat output file are
         read and tested against the alignments read and built into the NLMSA
         """
-        s1 = self.db['HBB0_PAGBO']
-        s2 = self.db['HBB1_VAREX']
-        s3 = self.db['gi|171854975|dbj|AB364477.1|:0']
+        s1 = self.srcDB['HBB0_PAGBO']
+        s2 = self.srcDB['HBB1_VAREX']
+        s3 = self.db.annodb['gi|171854975|dbj|AB364477.1|:0']
         
         ival = s1[20:30]        
         temp_lst = []
@@ -153,7 +130,7 @@ class Blat_NLMSA_test(unittest.TestCase):
         read and tested against the alignments read and built into the NLMSA
         """
         s1_name = 'HBB1_VAREX'
-        s1 = self.db[s1_name]
+        s1 = self.srcDB[s1_name]
         s1_blatalns = []
         
         for blataln in self.matches:
@@ -192,7 +169,7 @@ class Blat_NLMSA_test(unittest.TestCase):
             start = s2grp[1]/3
             end = s2grp[2]/3
             frame_no = s2grp[1]%3            
-            s2 = self.db[s2grp[0]+":"+str(frame_no)]
+            s2 = self.db.annodb[s2grp[0]+":"+str(frame_no)]
             temp_lst2.append(str(s2[start:end]))
         
         self.assertEqual(temp_lst1, temp_lst2)
