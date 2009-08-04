@@ -109,7 +109,7 @@ class Blat_NLMSA_test(unittest.TestCase):
         
         self.db = seqdb.SequenceFileDB(os.path.join(thisdir,
                                                     'data/translatedDB.fa'))
-        self.aln_type = 1 #protein-dna alignmet = 1, else - 0 
+        self.aln_type = 1 # protein-dna alignmet = 1, else - 0 
         
         self.matches, genome_names = blat_NLMSA.parse_blat(self.buf, 
                                                                 self.aln_type)
@@ -191,13 +191,12 @@ class Blat_NLMSA_test(unittest.TestCase):
         for s2grp in s2_group:
             start = s2grp[1]/3
             end = s2grp[2]/3
-            frame_no = s2grp[1]%3            
+            frame_no = (s2grp[1]%3) 
             s2 = self.db[s2grp[0]+":"+str(frame_no)]
             temp_lst2.append(str(s2[start:end]))
         
         self.assertEqual(temp_lst1, temp_lst2)
-    
- 
+        
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(Blat_test))
