@@ -20,8 +20,10 @@ class Lagan_NLMSA_test(unittest.TestCase):
         self.buf = self.buf.replace("\r\n","\n")
         
         thisdir = os.path.abspath(os.path.dirname(__file__))
-        self.db = seqdb.SequenceFileDB(os.path.join(thisdir,
-                                                    'test_genomes.fna'))
+         
+        def thisfile(name):
+            return os.path.join(thisdir, name)
+        self.db = seqdb.SequenceFileDB(thisfile('test_genomes.fna'))
         
         
         seqList, seq_names = lagan_NLMSA.read_lagan(self.buf)

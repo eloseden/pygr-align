@@ -92,10 +92,13 @@ class Clustalw_NLMSA_test(unittest.TestCase):
         """
 
         thisdir = os.path.abspath(os.path.dirname(__file__))
-        self.db = seqdb.SequenceFileDB(os.path.join(thisdir,
-                                                    'test_genomes_file'))
         
-        buf = open(os.path.join(thisdir, 'test_clustalw_alignment.aln'),"r").read()
+        def thisfile(name):
+            return os.path.join(thisdir, name)
+        
+        self.db = seqdb.SequenceFileDB(thisfile('test_genomes_file'))
+        
+        buf = open(thisfile('test_clustalw_alignment.aln'), "r").read()
         
         clustal_res_list = Clustalw_NLMSA.read_clustalw(buf.split("\n"))
         

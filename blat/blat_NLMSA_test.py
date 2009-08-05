@@ -2,8 +2,7 @@
 
 import os
 import unittest
-from pygr import cnestedlist
-from pygr import seqdb
+from pygr import cnestedlist, seqdb
 import blat_NLMSA
 
 class Blat_test(unittest.TestCase):
@@ -13,14 +12,14 @@ class Blat_test(unittest.TestCase):
     def setUp(self):
         self.buf = open('data/output.psl').read()
         self.buf = self.buf.replace("\r\n","\n")
-        self.aln_type = 0 #if protein-dna-1,else-0       
+        self.protDNAaln = False #if protein-dna alignment - True,else- False       
         
     def test_calculate_end(self):
-        ends = blat_NLMSA.calculate_end([10, 20], [12, 13], self.aln_type)
+        ends = blat_NLMSA.calculate_end([10, 20], [12, 13], self.protDNAaln)
         self.assertEqual(ends, [22, 33])
  
     def test_parse_blat(self) :
-        matches, genome_names = blat_NLMSA.parse_blat(self.buf, self.aln_type)
+        matches, genome_names = blat_NLMSA.parse_blat(self.buf, self.protDNAaln)
         self.assertEqual(set(genome_names), set(['testgenome1', 'testgenome2',
                                                  'testgenome3', 'testgenome4']))
         
@@ -64,16 +63,25 @@ class Blat_NLMSA_test(unittest.TestCase):
         self.buf = self.buf.replace("\r\n","\n")
         
         thisdir = os.path.abspath(os.path.dirname(__file__))
-        self.db = seqdb.SequenceFileDB(os.path.join(thisdir,
-                                                    'data/test_genomes.fna'))
-        self.aln_type = 0 #if protein-dna-1,else-0      
-        matches, genome_names = blat_NLMSA.parse_blat(self.buf, self.aln_type)
         
-        alignment = cnestedlist.NLMSA('test', mode='memory', seqDict=self.db,
-                                      use_virtual_lpo=True)
+        def thisfile(name):
+            return os.path.join(thisdir, name)
+
+        self.srcDB = seqdb.SequenceFileDB(thisfile('data/test_genomes.fna'))
+        self.destDB = seqdb.SequenceFileDB(thisfile('data/test_genomes.fna'))
+        
+        self.protDNAaln = False #if protein-dna alignment - True,else- False      
+       
+        matches, genome_names = blat_NLMSA.parse_blat(self.buf, self.protDNAaln)
+        
+        alignment = cnestedlist.NLMSA('test', mode='memory', seqDict=self.srcDB,
+                                     use_virtual_lpo=True)
+        #alignment = cnestedlist.NLMSA('test', mode='memory', pairwiseMode=True,
+                                      #bidirectional=False)????????
 
         self.temp_nlmsa = blat_NLMSA.create_NLMSA_blat(self.buf, alignment,
-                                                       seqDB=self.db)
+                                                       self.srcDB, self.destDB,
+                                                       self.protDNAaln)
     
 
     def test_align_manual1(self):
@@ -82,10 +90,10 @@ class Blat_NLMSA_test(unittest.TestCase):
         read and tested against the alignments read and built into the NLMSA
         """
         
-        s1 = self.db['testgenome1']
-        s2 = self.db['testgenome2']
-        s3 = self.db['testgenome3']
-        s4 = self.db['testgenome4']
+        s1 = self.srcDB['testgenome1']
+        s2 = self.srcDB['testgenome2']
+        s3 = self.srcDB['testgenome3']
+        s4 = self.srcDB['testgenome4']
         
         temp_lst=[]
         

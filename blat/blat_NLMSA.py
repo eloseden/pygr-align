@@ -30,11 +30,13 @@ How To Use This Module
 1. Import it: ``import blat_NLMSA``.
    You will also need to ``from pygr import cnestedlist, seqdb``.
 
-2. Obtain the NLMSA using create_NLMSA_blat(buf, seqDb, al)
-   function. One needs to pass blat output file object (buf), sequence
-   database(seqDb) and the NLMSA object (al) to the function and the
-   function returns the modified/built NLMSA.
-   ``nlmsa_aln = create_NLMSA_blat(buf, seqDb, al)``
+2. Obtain NLMSA using create_NLMSA_blat(buf, al, srcDB, destDB, protDNAaln=True)
+   function. One needs to pass blat output file object (buf), 
+   the NLMSA object (al), alignment type (protDNAaln)- True if protein-DNA 
+   alignment or False otherwise, query database (srcDB), and target 
+   database(destDB) to the function and the function returns the modified/built
+   NLMSA.
+   ``nlmsa_aln = create_NLMSA_blat(buf, al, srcDB, destDB, protDNAaln=True)``
 
 """
 
@@ -89,23 +91,23 @@ class BlatUngappedBlock:
 
         return (q, t)
 
-def calculate_end(Starts, blockSize, aln_type):
+def calculate_end(Starts, blockSize, protDNAaln):
     """
     Calculate the end coordinates of ungapped blocks
     """
     Ends = []
-          
+    
     for i in range(0, len(blockSize)):
-        if aln_type:
+        if protDNAaln:
             Ends.append(int(Starts[i]) + 3*int(blockSize[i]))
         else:
             Ends.append(int(Starts[i]) + int(blockSize[i]))
 
     return Ends
        
-def parse_blat(buf, aln_type):
+def parse_blat(buf, protDNAaln):
     """
-    Takes a blat alignment buffer and aln_type and returns a list 
+    Takes a blat alignment buffer and alignment type and returns a list 
     of BlastLocalAlignments and names of the sequences.
     """
 
@@ -142,8 +144,8 @@ def parse_blat(buf, aln_type):
        blockSize = map(int, record[18].strip(',').split(','))
        qStarts = map(int, record[19].strip(',').split(','))       
        tStarts = map(int, record[20].strip(',').split(','))
-       qEnds = map(int, calculate_end(qStarts, blockSize, 0))
-       tEnds = map(int, calculate_end(tStarts, blockSize, aln_type))
+       qEnds = map(int, calculate_end(qStarts, blockSize, False))
+       tEnds = map(int, calculate_end(tStarts, blockSize, protDNAaln))
        seqs_names = seqs_names.union(set([qName, tName]))
 
        # construct a list of tuples with each tuple containing
@@ -164,11 +166,11 @@ def parse_blat(buf, aln_type):
 
     return matches, list(seqs_names)
 
-def build_blat_ivals(buf, aln_type):
+def build_blat_ivals(buf, protDNAaln):
     """
-    Takes a blat file buffer and aln_type as input and builds the ivals
+    Takes a blat file buffer and alignment type as input and builds the ivals
     """
-    blataln_list, seqs_names = parse_blat(buf, aln_type)
+    blataln_list, seqs_names = parse_blat(buf, protDNAaln)
     
     for blt_al in blataln_list:
         seqs_name1 = getattr(blt_al, "qSeqName")
@@ -202,30 +204,22 @@ def build_blat_ivals(buf, aln_type):
 
         yield ivals
 
-def create_NLMSA_blat(buf, al, aln_type=None, seqDB=None, srcDB=None, destDB=None):
+def create_NLMSA_blat(buf, al, srcDB, destDB, protDNAaln=True):
     """
-    Takes a blat alignment file buffer, NLMSA (al), aln_type, srcDB and destDB 
-    as input and returns a built NLMSA
-    aln_blat - optional arg with 1 denoting protein-dna alignment and 
-    anything else(0 or None) denoting protein-protein or dna-dna alignments 
+    Takes a blat alignment file buffer (buf), NLMSA (al), alignment type (protDNAaln),
+    srcDB and destDB as input and returns a built NLMSA
+    protDNAaln - arg with True denoting protein-dna alignment and 
+    False denoting protein-protein or dna-dna alignments 
     """
-    if destDB:
-        destDB = translationDB.get_translation_db(destDB)
-    if aln_type:
-        ivals_list = build_blat_ivals(buf, aln_type)
-    else:
-        ivals_list = build_blat_ivals(buf, 0)
-   
-    for ivals in ivals_list:
-        alignedIvalsAttrs = dict(id=0, start=1, stop=2, idDest=0, startDest=1,
-                                 stopDest=2, ori=3, oriDest=3)        
+    ivals_list = build_blat_ivals(buf, protDNAaln)
+
+    alignedIvalsAttrs = dict(id=0, start=1, stop=2, idDest=0, startDest=1,
+                             stopDest=2, ori=3, oriDest=3)        
+
+    cti = nlmsa_utils.CoordsToIntervals(srcDB, destDB,
+                                        alignedIvalsAttrs)
         
-        if seqDB:
-            cti = nlmsa_utils.CoordsToIntervals(seqDB, seqDB,
-                                            alignedIvalsAttrs)
-        else:
-            cti = nlmsa_utils.CoordsToIntervals(srcDB, destDB,
-                                            alignedIvalsAttrs)
+    for ivals in ivals_list:
         al.add_aligned_intervals(cti(ivals))
         
     #build alignment

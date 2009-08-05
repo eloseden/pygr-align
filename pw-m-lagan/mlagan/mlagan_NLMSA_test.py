@@ -5,14 +5,12 @@ from pygr import cnestedlist
 from pygr import seqdb
 import mlagan_NLMSA
 
-
-
 class mlagan_NLMSA_test(unittest.TestCase):
 
     
     def setUp(self):
         """
-        initilize/create the NLMSA using mlagan alignment file
+        Initilize/create the NLMSA using mlagan alignment file
         the file containing the genomes created with in memory mode,
         read in the sequences from the genomes file
         """
@@ -21,8 +19,11 @@ class mlagan_NLMSA_test(unittest.TestCase):
         self.buf = self.buf.replace("\r\n","\n")
         
         thisdir = os.path.abspath(os.path.dirname(__file__))
-        self.db = seqdb.SequenceFileDB(os.path.join(thisdir,
-                                                    'test_genomes.fna'))
+         
+        def thisfile(name):
+            return os.path.join(thisdir, name)
+        
+        self.db = seqdb.SequenceFileDB(thisfile('test_genomes.fna'))
         
         
         seqList, seq_names = mlagan_NLMSA.read_mlagan(self.buf)
@@ -31,10 +32,6 @@ class mlagan_NLMSA_test(unittest.TestCase):
                                       use_virtual_lpo=True)
 
 
-        
-        
-
-        
         self.temp_nlmsa = mlagan_NLMSA.create_NLMSA_mlagan(self.buf, self.db,
                                                                alignment)
 

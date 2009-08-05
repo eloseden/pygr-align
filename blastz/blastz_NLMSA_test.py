@@ -80,8 +80,12 @@ class Blastz_NLMSA_test(unittest.TestCase):
         self.buf = self.buf.replace("\r\n","\n")
 
         thisdir = os.path.abspath(os.path.dirname(__file__))
-        self.db = seqdb.SequenceFileDB(os.path.join(thisdir,
-                                                    'test_genomes.fna'))
+        
+        def thisfile(name):
+            return os.path.join(thisdir, name)
+        
+        self.db = seqdb.SequenceFileDB(thisfile('test_genomes.fna'))
+        
         matches, genome_names = blastz_NLMSA.parse_blastz(self.buf)
         
         alignment = cnestedlist.NLMSA('test', mode='memory', seqDict=self.db,
@@ -89,9 +93,6 @@ class Blastz_NLMSA_test(unittest.TestCase):
 
         self.temp_nlmsa = blastz_NLMSA.create_NLMSA_blastz(self.buf,
                                                    self.db, alignment)
-    
-        
-        
 
     def test_align_manual1(self):
         """
